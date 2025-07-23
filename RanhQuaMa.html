@@ -1,0 +1,1917 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trò chơi học tiếng Anh</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light background color */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 15px; /* Reduced overall padding for small screens */
+            box-sizing: border-box;
+            -webkit-text-size-adjust: 100%; /* Prevent text zoom on orientation change */
+        }
+        .game-container {
+            background-color: #ffffff; /* White background for container */
+            padding: 25px; /* Reduced padding for container */
+            border-radius: 15px; /* Rounded corners */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Soft shadow */
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            box-sizing: border-box; /* Ensure padding is included in width */
+        }
+        h1 {
+            color: #2c3e50; /* Title color */
+            margin-bottom: 18px; /* Adjusted margin */
+            font-weight: 700;
+            font-size: 1.8em; /* Adjusted font size for mobile */
+            word-wrap: break-word; /* Ensure long titles wrap */
+        }
+        p {
+            color: #34495e; /* Normal text color */
+            margin-bottom: 12px; /* Adjusted margin */
+            font-size: 0.95em; /* Adjusted font size */
+            word-wrap: break-word;
+        }
+        .phrase-display {
+            font-size: 1.6em; /* Adjusted font size */
+            font-weight: 600;
+            color: #3498db; /* Blue color for phrase */
+            margin-bottom: 20px; /* Adjusted margin */
+            padding: 12px; /* Adjusted padding */
+            background-color: #ecf0f1;
+            border-radius: 10px;
+            min-height: 60px; /* Slightly increased minimum height */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.4; /* Increased line height for readability */
+            word-wrap: break-word; /* Ensure long phrases wrap */
+            overflow-wrap: break-word; /* For newer browsers */
+            hyphens: auto; /* Allow hyphenation for long words */
+        }
+        input[type="text"] {
+            width: calc(100% - 20px); /* Adjust width to account for padding */
+            padding: 14px; /* Increased padding for input */
+            margin-bottom: 18px; /* Adjusted margin */
+            border: 2px solid #cbd5e0; /* Input border */
+            border-radius: 8px; /* Rounded input */
+            font-size: 1.1em; /* Increased font size */
+            text-align: center;
+            outline: none;
+            transition: border-color 0.3s ease;
+            -webkit-appearance: none; /* Disable default iOS styling */
+            box-sizing: border-box; /* Ensure padding is included in width */
+            touch-action: manipulation; /* Improve touch responsiveness */
+        }
+        input[type="text"]:focus {
+            border-color: #3498db; /* Border color on focus */
+        }
+        button {
+            background-color: #3498db; /* Main button color */
+            color: white;
+            padding: 12px 22px; /* Increased padding for button */
+            border: none;
+            border-radius: 8px;
+            font-size: 1.05em; /* Adjusted font size */
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+            margin: 6px; /* Increased spacing between buttons */
+            min-width: 110px; /* Ensure larger minimum width for buttons */
+            touch-action: manipulation; /* Improve touch responsiveness */
+        }
+        button.hint-button {
+            background-color: #2ecc71; /* Green color for hint button */
+            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
+        }
+        button.hint-button:hover {
+            background-color: #27ae60;
+        }
+        button.next-button {
+            background-color: #9b59b6; /* Purple color for next button */
+            box-shadow: 0 4px 10px rgba(155, 89, 182, 0.3);
+        }
+        button.next-button:hover {
+            background-color: #8e44ad;
+        }
+        button.reset-button {
+            background-color: #f39c12; /* Orange color for reset button */
+            box-shadow: 0 4px 10px rgba(243, 156, 18, 0.3);
+        }
+        button.reset-button:hover {
+            background-color: #e67e22;
+        }
+        button:hover {
+            background-color: #2980b9; /* Button color on hover */
+            transform: translateY(-2px); /* Slight lift effect */
+        }
+        button:active {
+            transform: translateY(0); /* Press down effect */
+        }
+        button:disabled {
+            background-color: #95a5a6; /* Disabled button color */
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+        #message {
+            margin-top: 18px; /* Adjusted margin */
+            font-weight: 600;
+            color: #e74c3c; /* Default color for error/hint messages */
+            font-size: 1em; /* Increased font size */
+            word-wrap: break-word;
+        }
+        #score { /* Removed #highScore from this selector */
+            font-size: 1.05em; /* Adjusted font size */
+            color: #7f8c8d;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+        .correct-answer {
+            color: #27ae60 !important; /* Green for correct */
+        }
+        .incorrect-answer {
+            color: #e74c3c !important; /* Red for incorrect */
+        }
+        .hint-text {
+            color: #3498db !important; /* Blue for hint */
+        }
+        .loading-text {
+            color: #7f8c8d !important; /* Gray for loading state */
+        }
+        .mode-selector, .topic-selector {
+            margin-bottom: 15px; /* Adjusted margin */
+            padding: 10px; /* Increased padding */
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            font-size: 1em; /* Increased font size */
+            outline: none;
+            cursor: pointer;
+            width: 100%; /* Full width */
+            max-width: 220px; /* Increased max width */
+            -webkit-appearance: none; /* Disable default iOS styling */
+            background-color: #ffffff;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='%236B7280' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.7em center; /* Center vertically */
+            background-size: 0.9em auto;
+            box-sizing: border-box;
+        }
+        .selector-group {
+            display: flex;
+            flex-direction: column; /* Stack selectors vertically on mobile */
+            align-items: center; /* Center selectors */
+            gap: 12px; /* Increased gap between selectors */
+            margin-bottom: 20px;
+        }
+        /* Media query for larger screens to place selectors horizontally */
+        @media (min-width: 600px) {
+            .selector-group {
+                flex-direction: row;
+                justify-content: center;
+                gap: 20px; /* Increased gap on desktop */
+            }
+        }
+        /* Styles for choice buttons */
+        #choicesContainer {
+            display: grid; /* Changed to grid for better layout */
+            grid-template-columns: 1fr; /* Single column on small screens */
+            gap: 12px; /* Gap between choice buttons */
+            margin-top: 15px;
+        }
+        @media (min-width: 400px) { /* Adjust breakpoint for 2 columns */
+            #choicesContainer {
+                grid-template-columns: 1fr 1fr; /* Two columns on wider screens */
+            }
+        }
+        #choicesContainer button {
+            width: 100%; /* Make choice buttons take full width within grid column */
+            margin: 0; /* Remove extra margin from general button style */
+            padding: 15px; /* Adjust padding for choice buttons */
+            font-size: 1.1em;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        #choicesContainer button.bg-blue-500 {
+            background-color: #3498db;
+        }
+        #choicesContainer button.bg-blue-500:hover {
+            background-color: #2980b9;
+        }
+        #choicesContainer button.bg-green-500 {
+            background-color: #2ecc71; /* Green for correct answer */
+        }
+        #choicesContainer button.bg-red-500 {
+            background-color: #e74c3c; /* Red for incorrect answer */
+        }
+
+        /* Styles for the new answer mode selector */
+        .answer-mode-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            background-color: #e0e7eb;
+            padding: 10px 15px;
+            border-radius: 10px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .answer-mode-selector label {
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            font-weight: 600;
+            color: #555;
+        }
+        .answer-mode-selector input[type="radio"] {
+            display: none; /* Hide default radio button */
+        }
+        .answer-mode-selector input[type="radio"]:checked + label {
+            background-color: #3498db;
+            color: white;
+            box-shadow: 0 2px 5px rgba(52, 152, 219, 0.3);
+        }
+
+        /* Flashcard specific styles */
+        #flashcardContainer {
+            perspective: 1000px; /* For 3D flip effect */
+            height: 150px; /* Fixed height for the card */
+            margin-bottom: 20px;
+        }
+        .flashcard {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+        .flashcard-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-size: 1.6em;
+            font-weight: 600;
+            padding: 15px;
+            box-sizing: border-box;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+        }
+        .flashcard-front {
+            background-color: #f8f8f8;
+            color: #3498db;
+            border: 2px solid #3498db;
+        }
+        .flashcard-back {
+            background-color: #eaf7ff;
+            color: #2c3e50;
+            border: 2px solid #2ecc71;
+            transform: rotateY(180deg);
+        }
+        .flashcard-buttons {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+            justify-content: center;
+            gap: 10px; /* Space between buttons */
+        }
+        .flashcard-buttons button {
+            min-width: unset; /* Remove min-width constraint for these buttons */
+            padding: 10px 18px; /* Adjust padding */
+            font-size: 0.95em; /* Adjust font size */
+        }
+        .flashcard-buttons .known-button {
+            background-color: #2ecc71;
+            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
+        }
+        .flashcard-buttons .unknown-button {
+            background-color: #e74c3c;
+            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
+        }
+        .flashcard-buttons .unknown-button:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Học tiếng Anh giao tiếp hàng ngày cùng Bích Sì</h1>
+        <div class="selector-group">
+            <div class="flex flex-col items-center">
+                <label for="gameMode" class="block text-gray-700 text-sm font-bold mb-1">Chọn chế độ dịch:</label>
+                <select id="gameMode" class="mode-selector" onchange="setGameMode(this.value)">
+                    <option value="vi-to-en">Việt - Anh</option>
+                    <option value="en-to-vi">Anh - Việt</option>
+                </select>
+            </div>
+            <div class="flex flex-col items-center">
+                <label for="gameTopic" class="block text-gray-700 text-sm font-bold mb-1">Chọn chủ đề:</label>
+                <select id="gameTopic" class="topic-selector" onchange="setGameTopic(this.value)">
+                    <option value="daily-life">Cuộc sống hàng ngày</option>
+                    <option value="entertainment">Giải trí</option>
+                    <option value="science">Khoa học</option>
+                    <option value="tourism">Du lịch</option>
+                    <option value="technology">Công nghệ</option>
+                    <option value="electrical-industry">Ngành điện</option>
+                    <option value="ships">Tàu thuyền</option>
+                    <option value="computers">Máy tính</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- New: Answer Mode Selector -->
+        <div class="answer-mode-selector">
+            <input type="radio" id="modeTyping" name="answerMode" value="typing" checked onchange="setAnswerMode(this.value)">
+            <label for="modeTyping">Gõ chữ</label>
+            <input type="radio" id="modeChoices" name="answerMode" value="choices" onchange="setAnswerMode(this.value)">
+            <label for="modeChoices">Chọn đáp án</label>
+            <input type="radio" id="modeFlashcards" name="answerMode" value="flashcards" onchange="setAnswerMode(this.value)">
+            <label for="modeFlashcards">Thẻ học từ</label>
+            <input type="radio" id="modeFillInBlanks" name="answerMode" value="fill-in-blanks" onchange="setAnswerMode(this.value)">
+            <label for="modeFillInBlanks">Điền từ</label>
+            <input type="radio" id="modeListening" name="answerMode" value="listening" onchange="setAnswerMode(this.value)">
+            <label for="modeListening">Nghe hiểu</label>
+        </div>
+
+        <p id="instructionText">Dịch cụm từ tiếng Việt sau sang tiếng Anh:</p>
+        <div id="phraseDisplay" class="phrase-display"></div>
+        
+        <!-- Container for answer input or choices -->
+        <div id="answerSection">
+            <!-- New: Audio Controls for Listening Mode -->
+            <div id="audioControls" style="display:none;" class="flex flex-col items-center gap-4">
+                <button id="playAudioButton" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                    </svg>
+                    Nghe cụm từ
+                </button>
+                <button id="showPhraseButton" style="display:none;" class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 mt-2">
+                    Hiện cụm từ
+                </button>
+            </div>
+
+            <input type="text" id="answerInput" placeholder="Nhập bản dịch của bạn">
+            <div id="choicesContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4" style="display:none;">
+                <!-- Choice buttons will be populated here by JavaScript -->
+            </div>
+            <div id="flashcardContainer" style="display:none;">
+                <!-- Flashcard content will be populated here by JavaScript -->
+            </div>
+        </div>
+
+        <div class="flex justify-center flex-wrap mt-6">
+            <button id="checkButton" onclick="checkAnswer()">Kiểm tra</button>
+            <button id="nextButton" class="next-button" onclick="nextPhrase()">Cụm từ tiếp theo</button>
+        </div>
+        <p id="message"></p>
+        <p id="score">Điểm: 0</p>
+        <button id="resetProgressButton" class="reset-button mt-4" onclick="resetProgress()">Đặt lại tiến độ</button>
+    </div>
+
+    <script>
+        // List of phrases by topic (initial/fallback data)
+        const phrasesByTopic = {
+            "daily-life": [
+                { vi: "Chào buổi sáng", en: "Good morning" },
+                { vi: "Bạn khỏe không?", en: "How are you?" },
+                { vi: "Tôi khỏe, cảm ơn", en: "I'm fine, thank you" },
+                { vi: "Tên bạn là gì?", en: "What is your name?" },
+                { vi: "Tên tôi là...", en: "My name is..." },
+                { vi: "Rất vui được gặp bạn", en: "Nice to meet you" },
+                { vi: "Tạm biệt", en: "Goodbye" },
+                { vi: "Hẹn gặp lại", en: "See you later" },
+                { vi: "Xin lỗi", en: "Excuse me" },
+                { vi: "Cảm ơn", en: "Thank you" },
+                { vi: "Không có gì", en: "You're welcome" },
+                { vi: "Vâng", en: "Yes" },
+                { vi: "Không", en: "No" },
+                { vi: "Làm ơn", en: "Please" },
+                { vi: "Bạn có thể giúp tôi không?", en: "Can you help me?" },
+                { vi: "Tôi không hiểu", en: "I don't understand" },
+                { vi: "Bạn nói tiếng Anh không?", en: "Do you speak English?" },
+                { vi: "Tôi nói một chút tiếng Anh", en: "I speak a little English" },
+                { vi: "Bao nhiêu tiền?", en: "How much is it?" },
+                { vi: "Tôi muốn...", en: "I would like..." },
+                { vi: "Bạn đến từ đâu?", en: "Where are you from?" },
+                { vi: "Tôi đến từ Việt Nam", en: "I am from Vietnam" },
+                { vi: "Chúc một ngày tốt lành!", en: "Have a nice day!" },
+                { vi: "Bạn có rảnh không?", en: "Are you free?" },
+                { vi: "Tôi đói", en: "I am hungry" },
+                { vi: "Tôi khát", en: "I am thirsty" },
+                { vi: "Tôi mệt", en: "I am tired" },
+                { vi: "Mấy giờ rồi?", en: "What time is it?" },
+                { vi: "Bạn có khỏe không?", en: "How are you doing?" },
+                { vi: "Tôi ổn", en: "I am good" },
+                { vi: "Tôi cần giúp đỡ", en: "I need help" },
+                { vi: "Bạn có thể lặp lại không?", en: "Can you repeat that?" },
+                { vi: "Tôi xin lỗi", en: "I am sorry" },
+                { vi: "Không vấn đề gì", en: "No problem" },
+                { vi: "Chúc may mắn", en: "Good luck" },
+                { vi: "Chúc mừng sinh nhật", en: "Happy birthday" },
+                { vi: "Chúc mừng năm mới", en: "Happy New Year" },
+                { vi: "Chúc Giáng sinh vui vẻ", en: "Merry Christmas" },
+                { vi: "Chúc ngon miệng", en: "Enjoy your meal" },
+                { vi: "Bạn có muốn uống gì không?", en: "Would you like something to drink?" },
+                { vi: "Tôi muốn một cốc nước", en: "I would like a glass of water" },
+                { vi: "Bạn có thể cho tôi xem đường đi không?", en: "Can you show me the way?" },
+                { vi: "Nó ở đâu?", en: "Where is it?" },
+                { vi: "Rẽ trái", en: "Turn left" },
+                { vi: "Rẽ phải", en: "Turn right" },
+                { vi: "Đi thẳng", en: "Go straight" },
+                { vi: "Ở đây", en: "Here" },
+                { vi: "Ở đó", en: "There" },
+                { vi: "Bao lâu thì tới?", en: "How long does it take?" },
+                { vi: "Nó cách đây bao xa?", en: "How far is it?" },
+                { vi: "Tôi bị lạc đường", en: "I am lost" },
+                { vi: "Bạn có thể nói chậm hơn không?", en: "Can you speak slower?" },
+                { vi: "Tôi cần một bác sĩ", en: "I need a doctor" },
+                { vi: "Khẩn cấp!", en: "Emergency!" },
+                { vi: "Gọi cảnh sát", en: "Call the police" },
+                { vi: "Gọi cứu thương", en: "Call an ambulance" },
+                { vi: "Tôi không cảm thấy khỏe", en: "I don't feel well" },
+                { vi: "Tôi bị đau", en: "I have pain" },
+                { vi: "Tôi bị sốt", en: "I have a fever" },
+                { vi: "Tôi bị ho", en: "I have a cough" },
+                { vi: "Tôi bị cảm lạnh", en: "I have a cold" },
+                { vi: "Tôi bị dị ứng", en: "I have an allergy" },
+                { vi: "Bạn có thể giúp tôi tìm...", en: "Can you help me find..." },
+                { vi: "Tôi muốn mua...", en: "I want to buy..." },
+                { vi: "Bạn có cái này không?", en: "Do you have this?" },
+                { vi: "Nó có giá bao nhiêu?", en: "What is the price of this?" },
+                { vi: "Tôi có thể thử nó không?", en: "Can I try it on?" },
+                { vi: "Tôi sẽ lấy cái này", en: "I'll take this one" },
+                { vi: "Tôi muốn thanh toán", en: "I want to pay" },
+                { vi: "Bạn có chấp nhận thẻ tín dụng không?", en: "Do you accept credit cards?" },
+                { vi: "Tiền mặt", en: "Cash" },
+                { vi: "Hóa đơn", en: "Bill" },
+                { vi: "Biên lai", en: "Receipt" },
+                { vi: "Bạn có bàn trống không?", en: "Do you have a table available?" },
+                { vi: "Tôi đã đặt bàn", en: "I have a reservation" },
+                { vi: "Thực đơn", en: "Menu" },
+                { vi: "Tôi muốn gọi món", en: "I would like to order" },
+                { vi: "Món này là gì?", en: "What is this dish?" },
+                { vi: "Nó có cay không?", en: "Is it spicy?" },
+                { vi: "Nó có chứa hạt không?", en: "Does it contain nuts?" },
+                { vi: "Nó rất ngon", en: "It's delicious" },
+                { vi: "Tôi đã no", en: "I am full" },
+                { vi: "Xin lỗi, tôi không ăn thịt", en: "Excuse me, I don't eat meat" },
+                { vi: "Xin lỗi, tôi là người ăn chay", en: "Excuse me, I am vegetarian" },
+                { vi: "Bạn có thể mang cho tôi thêm nước không?", en: "Can you bring me more water?" },
+                { vi: "Hóa đơn, làm ơn", en: "The bill, please" },
+                { vi: "Tôi muốn đặt phòng", en: "I want to book a room" },
+                { vi: "Bạn có phòng trống không?", en: "Do you have any rooms available?" },
+                { vi: "Tôi muốn một phòng đơn", en: "I would like a single room" },
+                { vi: "Tôi muốn một phòng đôi", en: "I would like a double room" },
+                { vi: "Phòng có bao nhiêu tiền một đêm?", en: "How much is the room per night?" },
+                { vi: "Tôi muốn trả phòng", en: "I want to check out" },
+                { vi: "Thời gian nhận phòng là bao nhiêu?", en: "What time is check-in?" },
+                { vi: "Thời gian trả phòng là bao nhiêu?", en: "What time is check-out?" },
+                { vi: "Bạn có wifi không?", en: "Do you have Wi-Fi?" },
+                { vi: "Mật khẩu wifi là gì?", en: "What is the Wi-Fi password?" },
+                { vi: "Tôi có thể sử dụng điện thoại của bạn không?", en: "Can I use your phone?" },
+                { vi: "Tôi cần sạc điện thoại", en: "I need to charge my phone" },
+                { vi: "Bạn có ổ cắm điện không?", en: "Do you have a power outlet?" },
+                { vi: "Bạn có thể gọi taxi cho tôi không?", en: "Can you call a taxi for me?" },
+                { vi: "Tôi muốn đi đến sân bay", en: "I want to go to the airport" },
+                { vi: "Tôi muốn đi đến ga tàu", en: "I want to go to the train station" },
+                { vi: "Tôi muốn đi đến bến xe buýt", en: "I want to go to the bus station" },
+                { vi: "Bạn có bản đồ không?", en: "Do you have a map?" },
+                { vi: "Tôi muốn thuê xe", en: "I want to rent a car" },
+                { vi: "Bạn có thể giới thiệu một địa điểm tốt để tham quan không?", en: "Can you recommend a good place to visit?" },
+                { vi: "Tôi muốn đi tham quan", en: "I want to go sightseeing" },
+                { vi: "Vé vào cửa bao nhiêu tiền?", en: "How much is the entrance fee?" },
+                { vi: "Nó mở cửa lúc mấy giờ?", en: "What time does it open?" },
+                { vi: "Nó đóng cửa lúc mấy giờ?", en: "What time does it close?" },
+                { vi: "Tôi có thể chụp ảnh không?", en: "Can I take photos?" },
+                { vi: "Bạn có thể chụp ảnh cho tôi không?", en: "Can you take a picture for me?" },
+                { vi: "Thời tiết hôm nay thế nào?", en: "How is the weather today?" },
+                { vi: "Trời mưa", en: "It's raining" },
+                { vi: "Trời nắng", en: "It's sunny" },
+                { vi: "Trời lạnh", en: "It's cold" },
+                { vi: "Trời nóng", en: "It's hot" },
+                { vi: "Tôi thích nó", en: "I like it" },
+                { vi: "Tôi không thích nó", en: "I don't like it" },
+                { vi: "Nó rất đẹp", en: "It's beautiful" },
+                { vi: "Nó rất tệ", en: "It's bad" },
+                { vi: "Tôi hiểu rồi", en: "I understand" },
+                { vi: "Tôi không biết", en: "I don't know" },
+                { vi: "Bạn có thể nói lại không?", en: "Can you say that again?" },
+                { vi: "Tôi cần thực hành tiếng Anh", en: "I need to practice English" },
+                { vi: "Bạn có thể giúp tôi tìm đường đến...", en: "Can you help me find my way to...?" },
+                { vi: "Tôi có thể giúp gì cho bạn?", en: "How can I help you?" },
+                { vi: "Tôi đang tìm kiếm...", en: "I am looking for..." },
+                { vi: "Bạn có rảnh vào cuối tuần không?", en: "Are you free this weekend?" },
+                { vi: "Tôi rất bận", en: "I am very busy" },
+                { vi: "Tôi xin lỗi vì sự chậm trễ", en: "I apologize for the delay" },
+                { vi: "Không có gì đâu", en: "It's nothing" },
+                { vi: "Bạn có thể viết nó ra được không?", en: "Can you write it down?" },
+                { vi: "Tôi muốn đặt một cuộc hẹn", en: "I would like to make an appointment" },
+                { vi: "Tôi có thể gọi lại cho bạn sau không?", en: "Can I call you back later?" },
+                { vi: "Bạn có thể gửi email cho tôi không?", en: "Can you send me an email?" },
+                { vi: "Chúc ngủ ngon", en: "Good night" },
+                { vi: "Chúc bạn một ngày tốt lành", en: "Have a good day" },
+                { vi: "Tôi cần đi vệ sinh", en: "I need to go to the restroom" },
+                { vi: "Bạn có thể giới thiệu một nhà hàng tốt không?", en: "Can you recommend a good restaurant?" },
+                { vi: "Tôi muốn một tách cà phê", en: "I would like a cup of coffee" },
+                { vi: "Tôi muốn một ly trà", en: "I would like a glass of tea" },
+                { vi: "Bạn có thể giúp tôi mang hành lý không?", en: "Can you help me with my luggage?" },
+                { vi: "Tôi muốn đổi tiền", en: "I want to exchange money" },
+                { vi: "Tỷ giá hối đoái là bao nhiêu?", en: "What is the exchange rate?" },
+                { vi: "Tôi cần một biên lai", en: "I need a receipt" },
+                { vi: "Tôi muốn trả bằng thẻ", en: "I want to pay by card" },
+                { vi: "Tôi muốn trả bằng tiền mặt", en: "I want to pay with cash" },
+                { vi: "Bạn có thể gói nó lại không?", en: "Can you wrap it up?" },
+                { vi: "Tôi đang vội", en: "I am in a hurry" },
+                { vi: "Tôi có thể ngồi đây không?", en: "Can I sit here?" },
+                { vi: "Bạn có thể mở cửa sổ không?", en: "Can you open the window?" },
+                { vi: "Bạn có thể đóng cửa sổ không?", en: "Can you close the window?" },
+                { vi: "Tôi có thể mượn bút của bạn không?", en: "Can I borrow your pen?" },
+                { vi: "Tôi cần mua một ít đồ ăn", en: "I need to buy some food" },
+                { vi: "Bạn có thể nói tiếng Anh không?", en: "Do you speak English?" },
+                { vi: "Tôi không nói tiếng Việt", en: "I don't speak Vietnamese" },
+                { vi: "Bạn có thể giúp tôi dịch cái này không?", en: "Can you help me translate this?" },
+                { vi: "Tôi đang học tiếng Việt", en: "I am learning Vietnamese" },
+                { vi: "Bạn có thể lặp lại một lần nữa không?", en: "Can you say that again?" },
+                { vi: "Bạn có thể đánh vần nó không?", en: "Can you spell it?" },
+                { vi: "Tôi cần một bản đồ", en: "I need a map" },
+                { vi: "Tôi muốn đến...", en: "I want to go to..." },
+                { vi: "Bạn có thể chỉ cho tôi trên bản đồ không?", en: "Can you show me on the map?" },
+                { vi: "Tôi có thể đi bộ đến đó không?", en: "Can I walk there?" },
+                { vi: "Nó ở gần đây không?", en: "Is it near here?" },
+                { vi: "Nó ở xa không?", en: "Is it far away?" },
+                { vi: "Tôi bị lạc", en: "I am lost" },
+                { vi: "Bạn có thể giúp tôi tìm đường về khách sạn không?", en: "Can you help me find my way back to the hotel?" },
+                { vi: "Tôi muốn đi taxi", en: "I want to take a taxi" },
+                { vi: "Bạn có thể gọi taxi cho tôi không?", en: "Can you call a taxi for me?" },
+                { vi: "Đến sân bay", en: "To the airport" },
+                { vi: "Đến ga tàu", en: "To the train station" },
+                { vi: "Đến bến xe buýt", en: "To the bus station" },
+                { vi: "Tôi muốn thuê xe đạp", en: "I want to rent a bicycle" },
+                { vi: "Giá bao nhiêu một ngày?", en: "How much per day?" },
+                { vi: "Tôi muốn mua vé", en: "I want to buy a ticket" },
+                { vi: "Vé một chiều", en: "One-way ticket" },
+                { vi: "Vé khứ hồi", en: "Round-trip ticket" },
+                { vi: "Giờ khởi hành là mấy giờ?", en: "What time is the departure?" },
+                { vi: "Giờ đến là mấy giờ?", en: "What time is the arrival?" },
+                { vi: "Tôi muốn đi tham quan thành phố", en: "I want to go sightseeing in the city" },
+                { vi: "Bạn có thể giới thiệu một tour du lịch không?", en: "Can you recommend a tour?" },
+                { vi: "Tôi muốn mua quà lưu niệm", en: "I want to buy souvenirs" },
+                { vi: "Nó có giảm giá không?", en: "Is there a discount?" },
+                { vi: "Tôi thích màu này", en: "I like this color" },
+                { vi: "Tôi không thích màu này", en: "I don't like this color" },
+                { vi: "Nó có kích thước lớn hơn không?", en: "Do you have a larger size?" },
+                { vi: "Nó có kích thước nhỏ hơn không?", en: "Do you have a smaller size?" },
+                { vi: "Tôi cần một cái túi", en: "I need a bag" },
+                { vi: "Bạn có thể giúp tôi tìm một cửa hàng quần áo không?", en: "Can you help me find a clothing store?" },
+                { vi: "Tôi muốn ăn tối", en: "I want to have dinner" },
+                { vi: "Tôi muốn ăn trưa", en: "I want to have lunch" },
+                { vi: "Tôi muốn ăn sáng", en: "I want to have breakfast" },
+                { vi: "Tôi muốn một bàn cho hai người", en: "I would like a table for two" },
+                { vi: "Tôi muốn gọi món này", en: "I would like to order this dish" },
+                { vi: "Nó có chứa hải sản không?", en: "Does it contain seafood?" },
+                { vi: "Tôi bị dị ứng với...", en: "I am allergic to..." },
+                { vi: "Tôi là người ăn chay", en: "I am vegetarian" },
+                { vi: "Thực đơn", en: "Menu" },
+                { vi: "Đồ uống", en: "Drinks" },
+                { vi: "Món khai vị", en: "Appetizer" },
+                { vi: "Món chính", en: "Main course" },
+                { vi: "Món tráng miệng", en: "Dessert" },
+                { vi: "Bữa sáng", en: "Breakfast" },
+                { vi: "Bữa trưa", en: "Lunch" },
+                { vi: "Bữa tối", en: "Dinner" },
+                { vi: "Hóa đơn, làm ơn", en: "The bill, please" },
+                { vi: "Tiền tip", en: "Tip" },
+                { vi: "Dịch vụ khách hàng", en: "Customer service" },
+                { vi: "Khiếu nại", en: "Complaint" },
+                { vi: "Phản hồi", en: "Feedback" },
+                { vi: "Chuyến đi tuyệt vời", en: "Wonderful trip" },
+                { vi: "Kỳ nghỉ đáng nhớ", en: "Memorable vacation" },
+                { vi: "Trải nghiệm văn hóa", en: "Cultural experience" },
+                { vi: "Khám phá", en: "Exploration" },
+                { vi: "Phiêu lưu", en: "Adventure" },
+                { vi: "Cảnh đẹp", en: "Beautiful scenery" },
+                { vi: "Hoàng hôn", en: "Sunset" },
+                { vi: "Bình minh", en: "Sunrise" },
+                { vi: "Bầu trời đêm", en: "Night sky" },
+                { vi: "Ngôi sao", en: "Star" },
+                { vi: "Mặt trăng", en: "Moon" },
+                { vi: "Mặt trời", en: "Sun" },
+                { vi: "Đám mây", en: "Cloud" },
+                { vi: "Cầu vồng", en: "Rainbow" },
+                { vi: "Gió", en: "Wind" },
+                { vi: "Mưa", en: "Rain" },
+                { vi: "Tuyết", en: "Snow" },
+                { vi: "Nhiệt độ", en: "Temperature" },
+                { vi: "Thời tiết", en: "Weather" },
+                { vi: "Khí hậu", en: "Climate" },
+                { vi: "Mùa", en: "Season" },
+                { vi: "Mùa xuân", en: "Spring" },
+                { vi: "Mùa hè", en: "Summer" },
+                { vi: "Mùa thu", en: "Autumn / Fall" },
+                { vi: "Mùa đông", en: "Winter" }
+            ],
+            "entertainment": [
+                { vi: "Xem phim", en: "Watch a movie" },
+                { vi: "Nghe nhạc", en: "Listen to music" },
+                { vi: "Đọc sách", en: "Read a book" },
+                { vi: "Chơi game", en: "Play games" },
+                { vi: "Đi dạo", en: "Go for a walk" },
+                { vi: "Đi mua sắm", en: "Go shopping" },
+                { vi: "Đi ăn nhà hàng", en: "Go to a restaurant" },
+                { vi: "Đi xem hòa nhạc", en: "Go to a concert" },
+                { vi: "Đi xem kịch", en: "Go to a play" },
+                { vi: "Đi xem triển lãm", en: "Go to an exhibition" },
+                { vi: "Đi xem bảo tàng", en: "Go to a museum" },
+                { vi: "Đi công viên giải trí", en: "Go to an amusement park" },
+                { vi: "Đi sở thú", en: "Go to the zoo" },
+                { vi: "Đi thủy cung", en: "Go to the aquarium" },
+                { vi: "Đi công viên nước", en: "Go to a water park" },
+                { vi: "Đi câu cá", en: "Go fishing" },
+                { vi: "Đi bơi", en: "Go swimming" },
+                { vi: "Đi đạp xe", en: "Go cycling" },
+                { vi: "Đi bộ đường dài", en: "Go hiking" },
+                { vi: "Đi cắm trại", en: "Go camping" },
+                { vi: "Đi trượt tuyết", en: "Go skiing" },
+                { vi: "Đi lướt sóng", en: "Go surfing" },
+                { vi: "Đi lặn biển", en: "Go diving" },
+                { vi: "Đi chèo thuyền", en: "Go boating" },
+                { vi: "Đi du thuyền", en: "Go cruising" },
+                { vi: "Đi picnic", en: "Go for a picnic" },
+                { vi: "Tổ chức tiệc", en: "Throw a party" },
+                { vi: "Hát karaoke", en: "Sing karaoke" },
+                { vi: "Xem thể thao", en: "Watch sports" },
+                { vi: "Chơi thể thao", en: "Play sports" },
+                { vi: "Tập thể dục", en: "Exercise" },
+                { vi: "Yoga", en: "Yoga" },
+                { vi: "Thiền", en: "Meditation" },
+                { vi: "Nấu ăn", en: "Cook" },
+                { vi: "Làm vườn", en: "Garden" },
+                { vi: "Vẽ tranh", en: "Paint" },
+                { vi: "Chụp ảnh", en: "Take photos" },
+                { vi: "Viết lách", en: "Write" },
+                { vi: "Học một ngôn ngữ mới", en: "Learn a new language" },
+                { vi: "Học chơi một nhạc cụ", en: "Learn to play an instrument" },
+                { vi: "Làm đồ thủ công", en: "Do crafts" },
+                { vi: "Tình nguyện", en: "Volunteer" },
+                { vi: "Đi du lịch", en: "Travel" },
+                { vi: "Thư giãn", en: "Relax" },
+                { vi: "Ngủ", en: "Sleep" },
+                { vi: "Xem TV", en: "Watch TV" },
+                { vi: "Xem video trực tuyến", en: "Watch online videos" },
+                { vi: "Lướt mạng xã hội", en: "Browse social media" },
+                { vi: "Trò chuyện với bạn bè", en: "Chat with friends" },
+                { vi: "Đi uống cà phê", en: "Go for coffee" },
+                { vi: "Đi uống bia", en: "Go for a beer" },
+                { vi: "Đi bar", en: "Go to a bar" },
+                { vi: "Đi club", en: "Go to a club" },
+                { vi: "Khiêu vũ", en: "Dance" },
+                { vi: "Tham gia một lớp học", en: "Join a class" },
+                { vi: "Tham gia một câu lạc bộ", en: "Join a club" },
+                { vi: "Tham gia một sự kiện", en: "Attend an event" },
+                { vi: "Đi xem phim", en: "Go to the cinema" },
+                { vi: "Đi xem bóng đá", en: "Go to a football match" },
+                { vi: "Đi xem bóng rổ", en: "Go to a basketball game" },
+                { vi: "Đi xem bóng chuyền", en: "Go to a volleyball game" },
+                { vi: "Đi xem tennis", en: "Go to a tennis match" },
+                { vi: "Đi xem đua xe", en: "Go to a race" },
+                { vi: "Đi xem đấu vật", en: "Go to a wrestling match" },
+                { vi: "Đi xem quyền anh", en: "Go to a boxing match" },
+                { vi: "Đi xem võ thuật", en: "Go to a martial arts event" },
+                { vi: "Đi xem xiếc", en: "Go to the circus" },
+                { vi: "Đi xem ảo thuật", en: "Go to a magic show" },
+                { vi: "Đi xem hài kịch", en: "Go to a comedy show" },
+                { vi: "Đi xem ca nhạc", en: "Go to a musical" },
+                { vi: "Đi xem opera", en: "Go to an opera" },
+                { vi: "Đi xem ballet", en: "Go to a ballet" },
+                { vi: "Đi xem múa rối", en: "Go to a puppet show" },
+                { vi: "Đi xem trình diễn thời trang", en: "Go to a fashion show" },
+                { vi: "Đi xem lễ hội", en: "Go to a festival" },
+                { vi: "Đi xem diễu hành", en: "Go to a parade" },
+                { vi: "Đi xem pháo hoa", en: "Go to a fireworks display" },
+                { vi: "Đi xem lễ hội ánh sáng", en: "Go to a light festival" },
+                { vi: "Đi xem lễ hội hoa", en: "Go to a flower festival" },
+                { vi: "Đi xem lễ hội ẩm thực", en: "Go to a food festival" },
+                { vi: "Đi xem lễ hội bia", en: "Go to a beer festival" },
+                { vi: "Đi xem lễ hội rượu vang", en: "Go to a wine festival" },
+                { vi: "Đi xem lễ hội âm nhạc", en: "Go to a music festival" },
+                { vi: "Đi xem lễ hội nghệ thuật", en: "Go to an art festival" }
+            ],
+            "science": [
+                { vi: "Vật lý", en: "Physics" },
+                { vi: "Hóa học", en: "Chemistry" },
+                { vi: "Sinh học", en: "Biology" },
+                { vi: "Thiên văn học", en: "Astronomy" },
+                { vi: "Địa chất học", en: "Geology" },
+                { vi: "Khoa học môi trường", en: "Environmental science" },
+                { vi: "Khoa học máy tính", en: "Computer science" },
+                { vi: "Toán học", en: "Mathematics" },
+                { vi: "Thống kê", en: "Statistics" },
+                { vi: "Kỹ thuật", en: "Engineering" },
+                { vi: "Nghiên cứu khoa học", en: "Scientific research" },
+                { vi: "Thí nghiệm", en: "Experiment" },
+                { vi: "Lý thuyết", en: "Theory" },
+                { vi: "Giả thuyết", en: "Hypothesis" },
+                { vi: "Quan sát", en: "Observation" },
+                { vi: "Dữ liệu", en: "Data" },
+                { vi: "Phân tích", en: "Analysis" },
+                { vi: "Kết quả", en: "Result" },
+                { vi: "Kết luận", en: "Conclusion" },
+                { vi: "Phát minh", en: "Invention" },
+                { vi: "Khám phá", en: "Discovery" },
+                { vi: "Đổi mới", en: "Innovation" },
+                { vi: "Công nghệ", en: "Technology" },
+                { vi: "Khoa học ứng dụng", en: "Applied science" },
+                { vi: "Khoa học cơ bản", en: "Basic science" },
+                { vi: "Nhà khoa học", en: "Scientist" },
+                { vi: "Phòng thí nghiệm", en: "Laboratory" },
+                { vi: "Kính hiển vi", en: "Microscope" },
+                { vi: "Kính thiên văn", en: "Telescope" },
+                { vi: "Vũ trụ", en: "Universe" },
+                { vi: "Ngân hà", en: "Galaxy" },
+                { vi: "Hành tinh", en: "Planet" },
+                { vi: "Ngôi sao", en: "Star" },
+                { vi: "Mặt trời", en: "Sun" },
+                { vi: "Mặt trăng", en: "Moon" },
+                { vi: "Trái đất", en: "Earth" },
+                { vi: "Khí quyển", en: "Atmosphere" },
+                { vi: "Đa dạng sinh học", en: "Biodiversity" },
+                { vi: "Hệ sinh thái", en: "Ecosystem" },
+                { vi: "Biến đổi khí hậu", en: "Climate change" },
+                { vi: "Nóng lên toàn cầu", en: "Global warming" },
+                { vi: "Năng lượng tái tạo", en: "Renewable energy" },
+                { vi: "Năng lượng mặt trời", en: "Solar energy" },
+                { vi: "Năng lượng gió", en: "Wind energy" },
+                { vi: "Thủy điện", en: "Hydroelectric power" },
+                { vi: "Năng lượng hạt nhân", en: "Nuclear energy" },
+                { vi: "Gen", en: "Gene" },
+                { vi: "DNA", en: "DNA" },
+                { vi: "Tế bào", en: "Cell" },
+                { vi: "Vi khuẩn", en: "Bacteria" },
+                { vi: "Virus", en: "Virus" },
+                { vi: "Y học", en: "Medicine" },
+                { vi: "Dược phẩm", en: "Pharmaceuticals" },
+                { vi: "Công nghệ sinh học", en: "Biotechnology" },
+                { vi: "Công nghệ nano", en: "Nanotechnology" },
+                { vi: "Người máy", en: "Robot" },
+                { vi: "Trí tuệ nhân tạo", en: "Artificial intelligence" },
+                { vi: "Học máy", en: "Machine learning" },
+                { vi: "Dữ liệu lớn", en: "Big data" },
+                { vi: "Khoa học dữ liệu", en: "Data science" },
+                { vi: "Điện toán đám mây", en: "Cloud computing" },
+                { vi: "An ninh mạng", en: "Cybersecurity" },
+                { vi: "Thực tế ảo", en: "Virtual reality" },
+                { vi: "Thực tế tăng cường", en: "Augmented reality" },
+                { vi: "Internet vạn vật (IoT)", en: "Internet of Things (IoT)" },
+                { vi: "Blockchain", en: "Blockchain" },
+                { vi: "Tiền điện tử", en: "Cryptocurrency" },
+                { vi: "Công nghệ 5G", en: "5G technology" },
+                { vi: "Vật liệu mới", en: "New materials" },
+                { vi: "Kỹ thuật gen", en: "Genetic engineering" },
+                { vi: "Nghiên cứu vũ trụ", en: "Space exploration" },
+                { vi: "Du hành thời gian", en: "Time travel" },
+                { vi: "Lỗ đen", en: "Black hole" },
+                { vi: "Vụ nổ lớn (Big Bang)", en: "Big Bang" },
+                { vi: "Thuyết tương đối", en: "Theory of relativity" },
+                { vi: "Cơ học lượng tử", en: "Quantum mechanics" },
+                { vi: "Định luật bảo toàn", en: "Conservation law" },
+                { vi: "Nguyên tử", en: "Atom" },
+                { vi: "Phân tử", en: "Molecule" },
+                { vi: "Nguyên tố hóa học", en: "Chemical element" },
+                { vi: "Hợp chất", en: "Compound" },
+                { vi: "Phản ứng hóa học", en: "Chemical reaction" },
+                { vi: "Động vật", en: "Animal" },
+                { vi: "Thực vật", en: "Plant" },
+                { vi: "Nấm", en: "Fungi" },
+                { vi: "Vi sinh vật", en: "Microorganism" },
+                { vi: "Tiến hóa", en: "Evolution" },
+                { vi: "Di truyền", en: "Genetics" },
+                { vi: "Sinh thái học", en: "Ecology" },
+                { vi: "Môi trường", en: "Environment" },
+                { vi: "Ô nhiễm", en: "Pollution" },
+                { vi: "Tái chế", en: "Recycling" },
+                { vi: "Bền vững", en: "Sustainability" }
+            ],
+            "tourism": [
+                { vi: "Du lịch", en: "Tourism" },
+                { vi: "Đi du lịch", en: "Travel" },
+                { vi: "Đi nghỉ mát", en: "Go on vacation" },
+                { vi: "Đi công tác", en: "Go on a business trip" },
+                { vi: "Đặt vé máy bay", en: "Book a flight ticket" },
+                { vi: "Đặt phòng khách sạn", en: "Book a hotel room" },
+                { vi: "Hộ chiếu", en: "Passport" },
+                { vi: "Thị thực (Visa)", en: "Visa" },
+                { vi: "Sân bay", en: "Airport" },
+                { vi: "Ga tàu", en: "Train station" },
+                { vi: "Bến xe buýt", en: "Bus station" },
+                { vi: "Bến cảng", en: "Port / Harbor" },
+                { vi: "Máy bay", en: "Airplane / Plane" },
+                { vi: "Tàu hỏa", en: "Train" },
+                { vi: "Xe buýt", en: "Bus" },
+                { vi: "Tàu thủy", en: "Ship" },
+                { vi: "Taxi", en: "Taxi" },
+                { vi: "Thuê xe", en: "Rent a car" },
+                { vi: "Hành lý", en: "Luggage / Baggage" },
+                { vi: "Vali", en: "Suitcase" },
+                { vi: "Ba lô", en: "Backpack" },
+                { vi: "Khách sạn", en: "Hotel" },
+                { vi: "Nhà nghỉ", en: "Guesthouse" },
+                { vi: "Khu nghỉ dưỡng", en: "Resort" },
+                { vi: "Homestay", en: "Homestay" },
+                { vi: "Nhận phòng", en: "Check-in" },
+                { vi: "Trả phòng", en: "Check-out" },
+                { vi: "Phòng đơn", en: "Single room" },
+                { vi: "Phòng đôi", en: "Double room" },
+                { vi: "Phòng hạng sang", en: "Suite" },
+                { vi: "Hướng dẫn viên du lịch", en: "Tour guide" },
+                { vi: "Tour du lịch", en: "Tour" },
+                { vi: "Đi tham quan", en: "Go sightseeing" },
+                { vi: "Địa điểm du lịch", en: "Tourist attraction" },
+                { vi: "Danh lam thắng cảnh", en: "Scenic spot" },
+                { vi: "Di tích lịch sử", en: "Historical site" },
+                { vi: "Bãi biển", en: "Beach" },
+                { vi: "Núi", en: "Mountain" },
+                { vi: "Rừng", en: "Forest" },
+                { vi: "Thác nước", en: "Waterfall" },
+                { vi: "Hang động", en: "Cave" },
+                { vi: "Thành phố", en: "City" },
+                { vi: "Làng quê", en: "Countryside / Village" },
+                { vi: "Văn hóa", en: "Culture" },
+                { vi: "Ẩm thực", en: "Cuisine / Food" },
+                { vi: "Đặc sản địa phương", en: "Local specialty" },
+                { vi: "Mua sắm", en: "Shopping" },
+                { vi: "Quà lưu niệm", en: "Souvenir" },
+                { vi: "Thẻ tín dụng", en: "Credit card" },
+                { vi: "Tiền mặt", en: "Cash" },
+                { vi: "Đổi tiền", en: "Exchange money" },
+                { vi: "Tỷ giá hối đoái", en: "Exchange rate" },
+                { vi: "Bản đồ", en: "Map" },
+                { vi: "La bàn", en: "Compass" },
+                { vi: "GPS", en: "GPS" },
+                { vi: "Ngôn ngữ", en: "Language" },
+                { vi: "Phiên dịch", en: "Translation / Interpretation" },
+                { vi: "Sức khỏe", en: "Health" },
+                { vi: "Bảo hiểm du lịch", en: "Travel insurance" },
+                { vi: "Khẩn cấp", en: "Emergency" },
+                { vi: "Đồn cảnh sát", en: "Police station" },
+                { vi: "Bệnh viện", en: "Hospital" },
+                { vi: "Nhà thuốc", en: "Pharmacy" },
+                { vi: "Đại sứ quán", en: "Embassy" },
+                { vi: "Lãnh sự quán", en: "Consulate" },
+                { vi: "Múi giờ", en: "Time zone" },
+                { vi: "Chuyến bay", en: "Flight" },
+                { vi: "Ga đến", en: "Arrivals" },
+                { vi: "Ga đi", en: "Departures" },
+                { vi: "Cổng lên máy bay", en: "Gate" },
+                { vi: "Chuyến bay bị hoãn", en: "Delayed flight" },
+                { vi: "Chuyến bay bị hủy", en: "Cancelled flight" },
+                { vi: "Hành lý thất lạc", en: "Lost luggage" },
+                { vi: "Kinh nghiệm du lịch", en: "Travel experience" },
+                { vi: "Cẩm nang du lịch", en: "Travel guide" },
+                { vi: "Điểm đến", en: "Destination" },
+                { vi: "Hành trình", en: "Itinerary" },
+                { vi: "Khám phá", en: "Explore" },
+                { vi: "Phiêu lưu", en: "Adventure" },
+                { vi: "Nhiếp ảnh du lịch", en: "Travel photography" },
+                { vi: "Hồi ức", en: "Memories" },
+                { vi: "Kỷ niệm", en: "Souvenir" },
+                { vi: "Trải nghiệm", en: "Experience" },
+                { vi: "Thưởng thức", en: "Enjoy" }
+            ],
+            "technology": [
+                { vi: "Trí tuệ nhân tạo", en: "Artificial intelligence" },
+                { vi: "Học máy", en: "Machine learning" },
+                { vi: "Dữ liệu lớn", en: "Big data" },
+                { vi: "Khoa học dữ liệu", en: "Data science" },
+                { vi: "Điện toán đám mây", en: "Cloud computing" },
+                { vi: "An ninh mạng", en: "Cybersecurity" },
+                { vi: "Phát triển phần mềm", en: "Software development" },
+                { vi: "Lập trình", en: "Programming" },
+                { vi: "Ngôn ngữ lập trình", en: "Programming language" },
+                { vi: "Mã nguồn", en: "Source code" },
+                { vi: "Thuật toán", en: "Algorithm" },
+                { vi: "Mạng lưới thần kinh", en: "Neural network" },
+                { vi: "Thực tế ảo", en: "Virtual reality" },
+                { vi: "Thực tế tăng cường", en: "Augmented reality" },
+                { vi: "Internet vạn vật (IoT)", en: "Internet of Things (IoT)" },
+                { vi: "Blockchain", en: "Blockchain" },
+                { vi: "Tiền điện tử", en: "Cryptocurrency" },
+                { vi: "Công nghệ 5G", en: "5G technology" },
+                { vi: "Điện thoại thông minh", en: "Smartphone" },
+                { vi: "Máy tính bảng", en: "Tablet" },
+                { vi: "Máy tính xách tay", en: "Laptop" },
+                { vi: "Máy tính để bàn", en: "Desktop computer" },
+                { vi: "Phần cứng", en: "Hardware" },
+                { vi: "Phần mềm", en: "Software" },
+                { vi: "Hệ điều hành", en: "Operating system" },
+                { vi: "Ứng dụng", en: "Application / App" },
+                { vi: "Trình duyệt web", en: "Web browser" },
+                { vi: "Công cụ tìm kiếm", en: "Search engine" },
+                { vi: "Email", en: "Email" },
+                { vi: "Trang web", en: "Website" },
+                { vi: "Cơ sở dữ liệu", en: "Database" },
+                { vi: "Máy chủ", en: "Server" },
+                { vi: "Điện toán đám mây", en: "Cloud computing" },
+                { vi: "Lưu trữ đám mây", en: "Cloud storage" },
+                { vi: "Sao lưu dữ liệu", en: "Data backup" },
+                { vi: "Phục hồi dữ liệu", en: "Data recovery" },
+                { vi: "An ninh mạng", en: "Cybersecurity" },
+                { vi: "Mã hóa", en: "Encryption" },
+                { vi: "Giải mã", en: "Decryption" },
+                { vi: "Tường lửa", en: "Firewall" },
+                { vi: "Phần mềm diệt virus", en: "Antivirus software" },
+                { vi: "Mật khẩu", en: "Password" },
+                { vi: "Xác thực hai yếu tố", en: "Two-factor authentication" },
+                { vi: "Dấu vân tay", en: "Fingerprint" },
+                { vi: "Nhận diện khuôn mặt", en: "Facial recognition" },
+                { vi: "Thực tế ảo tăng cường", en: "Mixed reality" },
+                { vi: "In 3D", en: "3D printing" },
+                { vi: "Xe tự lái", en: "Self-driving car" },
+                { vi: "Máy bay không người lái (Drone)", en: "Drone" },
+                { vi: "Năng lượng mặt trời", en: "Solar energy" },
+                { vi: "Pin năng lượng mặt trời", en: "Solar panel" },
+                { vi: "Pin", en: "Battery" },
+                { vi: "Sạc", en: "Charge" },
+                { vi: "Cáp", en: "Cable" },
+                { vi: "Cổng USB", en: "USB port" },
+                { vi: "Bluetooth", en: "Bluetooth" },
+                { vi: "GPS", en: "GPS" },
+                { vi: "Cảm biến", en: "Sensor" },
+                { vi: "Camera", en: "Camera" },
+                { vi: "Màn hình", en: "Screen / Display" },
+                { vi: "Bàn phím", en: "Keyboard" },
+                { vi: "Chuột", en: "Mouse" },
+                { vi: "Máy in", en: "Printer" },
+                { vi: "Máy quét", en: "Scanner" },
+                { vi: "Loa", en: "Speaker" },
+                { vi: "Tai nghe", en: "Headphones" },
+                { vi: "Microphone", en: "Microphone" },
+                { vi: "Bộ xử lý", en: "Processor" },
+                { vi: "Bộ nhớ RAM", en: "RAM" },
+                { vi: "Ổ cứng", en: "Hard drive" },
+                { vi: "Ổ đĩa thể rắn (SSD)", en: "Solid State Drive (SSD)" },
+                { vi: "Thẻ nhớ", en: "Memory card" },
+                { vi: "Phần mềm độc hại", en: "Malware" },
+                { vi: "Virus máy tính", en: "Computer virus" },
+                { vi: "Lập trình", en: "Programming" },
+                { vi: "Ngôn ngữ lập trình", en: "Programming language" },
+                { vi: "Mã nguồn", en: "Source code" },
+                { vi: "Thuật toán", en: "Algorithm" },
+                { vi: "Dữ liệu", en: "Data" },
+                { vi: "Cơ sở dữ liệu", en: "Database" },
+                { vi: "Máy chủ", en: "Server" },
+                { vi: "Điện toán đám mây", en: "Cloud computing" },
+                { vi: "Lưu trữ đám mây", en: "Cloud storage" },
+                { vi: "Sao lưu dữ liệu", en: "Data backup" },
+                { vi: "Phục hồi dữ liệu", en: "Data recovery" },
+                { vi: "An ninh mạng", en: "Cybersecurity" },
+                { vi: "Mã hóa", en: "Encryption" },
+                { vi: "Giải mã", en: "Decryption" },
+                { vi: "Tấn công mạng", en: "Cyber attack" },
+                { vi: "Lừa đảo trực tuyến (Phishing)", en: "Phishing" },
+                { vi: "Tấn công từ chối dịch vụ (DDoS)", en: "DDoS attack" },
+                { vi: "Mã độc tống tiền (Ransomware)", en: "Ransomware" },
+                { vi: "Lỗ hổng bảo mật", en: "Security vulnerability" },
+                { vi: "Cập nhật phần mềm", en: "Software update" },
+                { vi: "Khắc phục sự cố", en: "Troubleshooting" },
+                { vi: "Hỗ trợ kỹ thuật", en: "Technical support" },
+                { vi: "Tài liệu hướng dẫn", en: "User manual" },
+                { vi: "Nâng cấp", en: "Upgrade" },
+                { vi: "Tương thích", en: "Compatible" },
+                { vi: "Hiệu suất", en: "Performance" },
+                { vi: "Tối ưu hóa", en: "Optimization" },
+                { vi: "Tự động hóa", en: "Automation" },
+                { vi: "Số hóa", en: "Digitization" },
+                { vi: "Trí tuệ nhân tạo (AI)", en: "Artificial Intelligence (AI)" },
+                { vi: "Học máy (ML)", en: "Machine Learning (ML)" },
+                { vi: "Dữ liệu lớn (Big Data)", en: "Big Data" },
+                { vi: "Khoa học dữ liệu", en: "Data Science" },
+                { vi: "Thực tế ảo (VR)", en: "Virtual Reality (VR)" },
+                { vi: "Thực tế tăng cường (AR)", en: "Augmented Reality (AR)" },
+                { vi: "Internet vạn vật (IoT)", en: "Internet of Things (IoT)" },
+                { vi: "Blockchain", en: "Blockchain" },
+                { vi: "Tiền điện tử", en: "Cryptocurrency" },
+                { vi: "Công nghệ 5G", en: "5G technology" },
+                { vi: "In 3D", en: "3D printing" },
+                { vi: "Robot", en: "Robot" },
+                { vi: "Tự động hóa", en: "Automation" },
+                { vi: "Mạng xã hội", en: "Social media" },
+                { vi: "Thương mại điện tử", en: "E-commerce" },
+                { vi: "Thanh toán trực tuyến", en: "Online payment" },
+                { vi: "Ngân hàng trực tuyến", en: "Online banking" },
+                { vi: "Giáo dục trực tuyến", en: "Online education" },
+                { vi: "Làm việc từ xa", en: "Remote work" },
+                { vi: "Hội nghị truyền hình", en: "Video conferencing" }
+            ]
+        };
+
+        let currentPhrases = []; // Current list of phrases for the topic
+        let currentPhraseIndex = 0;
+        let score = 0;
+        let currentMode = 'vi-to-en'; // Default translation mode
+        let currentTopic = 'daily-life'; // Default topic
+        let currentAnswerMode = 'typing'; // New: Default answer mode
+
+        // Arrays to store learned and review phrases
+        let learnedPhrases = [];
+        let reviewPhrases = [];
+
+        // Get references to DOM elements.
+        // Perform null checks immediately after getting to ensure elements exist.
+        const phraseDisplay = document.getElementById('phraseDisplay');
+        const answerInput = document.getElementById('answerInput');
+        const messageDisplay = document.getElementById('message');
+        const scoreDisplay = document.getElementById('score');
+        const nextButton = document.getElementById('nextButton');
+        const instructionText = document.getElementById('instructionText');
+        const gameModeSelect = document.getElementById('gameMode');
+        const gameTopicSelect = document.getElementById('gameTopic');
+        const choicesContainer = document.getElementById('choicesContainer'); // Element for choices
+        const checkButton = document.getElementById('checkButton');
+        const answerModeTyping = document.getElementById('modeTyping');
+        const answerModeChoices = document.getElementById('modeChoices');
+        const answerModeFlashcards = document.getElementById('modeFlashcards'); // Added flashcards radio
+        const answerModeFillInBlanks = document.getElementById('modeFillInBlanks'); // Added fill-in-blanks radio
+        const answerModeListening = document.getElementById('modeListening'); // Added listening radio
+        const flashcardContainer = document.getElementById('flashcardContainer');
+        const audioControls = document.getElementById('audioControls'); // New audio controls container
+        const playAudioButton = document.getElementById('playAudioButton'); // New play audio button
+        const showPhraseButton = document.getElementById('showPhraseButton'); // New show phrase button
+        const resetProgressButton = document.getElementById('resetProgressButton'); // New reset progress button
+
+        // Check for critical DOM elements when the script loads.
+        // If any element is not found, display a critical error and stop execution.
+        if (!phraseDisplay || !answerInput || !messageDisplay || !scoreDisplay || !nextButton || !instructionText || !gameModeSelect || !gameTopicSelect || !choicesContainer || !checkButton || !answerModeTyping || !answerModeChoices || !answerModeFlashcards || !answerModeFillInBlanks || !answerModeListening || !flashcardContainer || !audioControls || !playAudioButton || !showPhraseButton || !resetProgressButton) {
+            document.body.innerHTML = '<div style="color: red; text-align: center; padding: 20px; font-size: 1.2em; font-family: \'Inter\', sans-serif;">Lỗi nghiêm trọng: Không tìm thấy các thành phần trò chơi cần thiết. Vui lòng tải lại trang hoặc liên hệ hỗ trợ.</div>';
+            throw new Error("Critical DOM elements not found."); // Stop script
+        }
+
+        // Helper functions for localStorage
+        function getStoredPhrases(key) {
+            try {
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : [];
+            } catch (e) {
+                console.error(`Lỗi khi đọc từ localStorage (key: ${key}):`, e);
+                return [];
+            }
+        }
+
+        function setStoredPhrases(key, phrases) {
+            try {
+                localStorage.setItem(key, JSON.stringify(phrases));
+            } catch (e) {
+                console.error(`Lỗi khi ghi vào localStorage (key: ${key}):`, e);
+            }
+        }
+
+        function addPhraseToStorage(key, phraseObj) {
+            let phrases = getStoredPhrases(key);
+            // Check if phrase already exists to avoid duplicates
+            if (!phrases.some(p => p.vi === phraseObj.vi && p.en === phraseObj.en)) {
+                phrases.push(phraseObj);
+                setStoredPhrases(key, phrases);
+            }
+            // If adding to learned, remove from review (and vice versa for review)
+            if (key === 'learnedPhrases') {
+                removePhraseFromStorage('reviewPhrases', phraseObj);
+            } else if (key === 'reviewPhrases') {
+                removePhraseFromStorage('learnedPhrases', phraseObj);
+            }
+        }
+
+        function removePhraseFromStorage(key, phraseObj) {
+            let phrases = getStoredPhrases(key);
+            const initialLength = phrases.length;
+            phrases = phrases.filter(p => !(p.vi === phraseObj.vi && p.en === phraseObj.en));
+            if (phrases.length < initialLength) { // Only save if something was actually removed
+                setStoredPhrases(key, phrases);
+            }
+        }
+
+        // Fisher-Yates shuffle algorithm
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // Function to set game mode (translation direction)
+        function setGameMode(mode) {
+            try {
+                currentMode = mode;
+                resetGame(); // Reset game when mode changes
+                updateInstructionText();
+            } catch (e) {
+                messageDisplay.textContent = "Lỗi khi thay đổi chế độ dịch: " + e.message;
+                messageDisplay.className = 'incorrect-answer';
+                console.error("Set game mode error:", e);
+            }
+        }
+
+        // Function to set game topic
+        function setGameTopic(topic) {
+            try {
+                currentTopic = topic;
+                resetGame(); // Reset game when topic changes
+            } catch (e) {
+                messageDisplay.textContent = "Lỗi khi đặt lại trò chơi: " + e.message;
+                messageDisplay.className = 'incorrect-answer';
+                console.error("Set game topic error:", e);
+            }
+        }
+
+        // Function to set answer input mode (typing vs. choices vs. flashcards vs. fill-in-blanks vs. listening)
+        function setAnswerMode(mode) {
+            currentAnswerMode = mode;
+            // Hide all answer sections initially
+            answerInput.style.display = 'none';
+            choicesContainer.style.display = 'none';
+            flashcardContainer.style.display = 'none';
+            audioControls.style.display = 'none'; // Hide audio controls
+            checkButton.style.display = 'none'; // Hide check button by default
+            showPhraseButton.style.display = 'none'; // Hide show phrase button
+
+            // Disable game mode selector if in listening mode
+            gameModeSelect.disabled = (currentAnswerMode === 'listening');
+
+            // Re-display phrase to apply new input mode
+            displayNewPhrase(); 
+            messageDisplay.textContent = ''; // Clear messages
+            messageDisplay.className = '';
+        }
+
+        // Function to update instruction text based on current translation mode
+        function updateInstructionText() {
+            try {
+                if (currentAnswerMode === 'flashcards') {
+                    instructionText.textContent = "Nhấn vào thẻ để lật và học từ!";
+                    answerInput.placeholder = ""; // Not used in flashcard mode
+                } else if (currentAnswerMode === 'fill-in-blanks') {
+                    instructionText.textContent = "Điền từ còn thiếu vào chỗ trống:";
+                    answerInput.placeholder = ""; // Not used in fill-in-blanks mode
+                } else if (currentAnswerMode === 'listening') {
+                    instructionText.textContent = "Nghe cụm từ và gõ bản dịch tiếng Việt:"; // Initial instruction for listening
+                    answerInput.placeholder = "Nhập bản dịch tiếng Việt của bạn"; // Placeholder for typing after listening
+                }
+                else if (currentMode === 'vi-to-en') {
+                    instructionText.textContent = "Dịch cụm từ tiếng Việt sau sang tiếng Anh:";
+                    answerInput.placeholder = "Nhập bản dịch tiếng Anh của bạn";
+                } else { // en-to-vi
+                    instructionText.textContent = "Dịch cụm từ tiếng Anh sau sang tiếng Việt:";
+                    answerInput.placeholder = "Nhập bản dịch tiếng Việt của bạn";
+                }
+            } catch (e) {
+                messageDisplay.textContent = "Lỗi khi cập nhật hướng dẫn: " + e.message;
+                messageDisplay.className = 'incorrect-answer';
+                console.error("Update instruction text error:", e);
+            }
+        }
+
+        // Function to display a new phrase and its choices or input field
+        function displayNewPhrase() {
+            try {
+                // Clear previous state
+                choicesContainer.innerHTML = '';
+                flashcardContainer.innerHTML = ''; // Clear flashcard content
+                answerInput.value = '';
+                messageDisplay.textContent = '';
+                messageDisplay.className = '';
+                
+                // Hide all specific answer sections
+                answerInput.style.display = 'none';
+                choicesContainer.style.display = 'none';
+                flashcardContainer.style.display = 'none';
+                audioControls.style.display = 'none'; // Hide audio controls initially
+                checkButton.style.display = 'none'; // Hide check button by default
+                showPhraseButton.style.display = 'none'; // Hide show phrase button
+                scoreDisplay.style.display = 'block'; // Default to showing score
+
+                // Check if there are no phrases in the current topic
+                if (!currentPhrases || currentPhrases.length === 0) {
+                    phraseDisplay.textContent = "Không có cụm từ nào trong chủ đề này. Vui lòng chọn chủ đề khác hoặc tạo cụm từ mới.";
+                    answerInput.disabled = true;
+                    nextButton.disabled = true;
+                    checkButton.disabled = true;
+                    messageDisplay.textContent = "Vui lòng chọn chủ đề khác hoặc thêm cụm từ.";
+                    messageDisplay.className = 'incorrect-answer';
+                    return;
+                }
+
+                if (currentPhraseIndex >= currentPhrases.length) {
+                    // Game finished for this set of phrases
+                    phraseDisplay.textContent = "Bạn đã hoàn thành tất cả các cụm từ trong chủ đề này! Nhấn 'Cụm từ tiếp theo' để tạo bộ mới.";
+                    answerInput.disabled = true;
+                    checkButton.disabled = true;
+                    messageDisplay.textContent = `Điểm cuối cùng của bạn: ${score}/${currentPhrases.length}`;
+                    messageDisplay.className = 'correct-answer';
+                    nextButton.disabled = false; // Still allow pressing to generate new set
+                    return;
+                }
+
+                let currentPhraseObj = currentPhrases[currentPhraseIndex];
+                let phraseToSpeak, correctTranslation;
+
+                if (currentAnswerMode === 'listening') {
+                    // In listening mode, we always play English and ask for Vietnamese translation
+                    phraseToSpeak = currentPhraseObj.en; // English phrase to be spoken
+                    correctTranslation = currentPhraseObj.vi; // Expected answer is Vietnamese
+                    
+                    phraseDisplay.textContent = "Nghe và dịch cụm từ này..."; // Hide English text initially
+                    audioControls.style.display = 'flex'; // Show audio controls
+                    playAudioButton.disabled = false; // Enable play button
+                    showPhraseButton.style.display = 'none'; // Hide show phrase button initially
+                    instructionText.textContent = "Nghe cụm từ và gõ bản dịch tiếng Việt:"; // Initial instruction for listening
+
+                    // Set up the show phrase button's functionality
+                    showPhraseButton.onclick = () => {
+                        phraseDisplay.textContent = phraseToSpeak; // Reveal the English phrase
+                        showPhraseButton.style.display = 'none'; // Hide the button after showing
+                    };
+
+                    // Event listener for play audio button
+                    playAudioButton.onclick = () => {
+                        speakPhrase(phraseToSpeak, 'en-US'); // Speak English phrase
+                        playAudioButton.disabled = true; // Disable until speech ends
+
+                        // After speaking, re-enable the play button and show input/check button
+                        const utterance = new SpeechSynthesisUtterance(phraseToSpeak);
+                        utterance.lang = 'en-US';
+                        utterance.onend = () => {
+                            if (currentAnswerMode === 'listening') { // Ensure still in listening mode
+                                playAudioButton.disabled = false; // Re-enable play button
+                                answerInput.style.display = 'block';
+                                checkButton.style.display = 'inline-block';
+                                showPhraseButton.style.display = 'inline-block'; // Show "Hiện cụm từ" button
+                                answerInput.disabled = false;
+                                answerInput.focus();
+                                instructionText.textContent = "Gõ bản dịch tiếng Việt của cụm từ bạn vừa nghe:";
+                            }
+                        };
+                        speechSynthesis.speak(utterance);
+                    };
+
+                } else if (currentAnswerMode === 'fill-in-blanks') {
+                    // Existing fill-in-blanks logic
+                    correctTranslation = currentPhraseObj.en;
+                    const words = correctTranslation.split(/\s+/).filter(word => word.length > 0);
+
+                    if (words.length < 2) { // Need at least 2 words to make a blank
+                        currentPhraseIndex++;
+                        displayNewPhrase(); // Try next phrase
+                        return;
+                    }
+
+                    // Select a random word to be blanked out
+                    let blankIndex = Math.floor(Math.random() * words.length);
+                    let blankWord = words[blankIndex];
+
+                    // Simple check to avoid blanking out very common short words like 'a', 'an', 'the', 'is', 'are'
+                    const commonShortWords = ['a', 'an', 'the', 'is', 'are', 'am', 'was', 'were', 'be', 'to', 'of', 'in', 'on', 'at', 'for', 'with', 'from', 'by', 'but', 'and', 'or', 'so', 'if'];
+                    let attempts = 0;
+                    while (commonShortWords.includes(blankWord.toLowerCase().replace(/[^a-z0-9]/gi, '')) && attempts < 5) {
+                        blankIndex = Math.floor(Math.random() * words.length);
+                        blankWord = words[blankIndex];
+                        attempts++;
+                    }
+
+                    // Create the phrase with a blank
+                    phraseToSpeak = words.map((word, index) => {
+                        // Remove punctuation from the word when comparing for blanking, but keep it in the original word.
+                        const cleanWord = word.replace(/[^a-z0-9]/gi, ''); 
+                        if (index === blankIndex) {
+                            return '____'; // Placeholder for the blank
+                        }
+                        return word;
+                    }).join(' ');
+
+                    phraseDisplay.textContent = phraseToSpeak;
+                    choicesContainer.style.display = 'grid';
+                    // Generate choices for the blank
+                    let allChoices = [blankWord.replace(/[^a-z0-9]/gi, '')]; // Correct answer, cleaned
+                    const allOtherWords = currentPhrases
+                        .flatMap(p => p.en.split(/\s+/))
+                        .filter(word => word.length > 0 && word.toLowerCase().replace(/[^a-z0-9]/gi, '') !== blankWord.toLowerCase().replace(/[^a-z0-9]/gi, ''))
+                        .map(word => word.replace(/[^a-z0-9]/gi, '')); // Get all other words, clean them
+
+                    // Add up to 3 distinct wrong choices
+                    while (allChoices.length < 4 && allOtherWords.length > 0) {
+                        const randomIndex = Math.floor(Math.random() * allOtherWords.length);
+                        const wrongChoice = allOtherWords[randomIndex];
+                        if (!allChoices.includes(wrongChoice)) {
+                            allChoices.push(wrongChoice);
+                        }
+                        allOtherWords.splice(randomIndex, 1); // Remove used word
+                    }
+                    
+                    // If not enough unique wrong choices, duplicate the correct one (or just use fewer choices)
+                    while (allChoices.length < 4) {
+                        allChoices.push(blankWord.replace(/[^a-z0-9]/gi, '')); // Add duplicates of correct answer
+                    }
+
+                    shuffleArray(allChoices); // Shuffle choices
+
+                    // Create and append choice buttons for fill-in-blanks
+                    allChoices.forEach(choice => {
+                        const button = document.createElement('button');
+                        button.textContent = choice;
+                        button.className = 'bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105';
+                        button.onclick = () => checkFillInBlanksAnswer(choice, blankWord.replace(/[^a-z0-9]/gi, '')); // Pass cleaned blank word
+                        choicesContainer.appendChild(button);
+                    });
+                    updateInstructionText(); // Update instruction text for fill-in-blanks
+                } else { // Typing or Choices or Flashcards (non-listening, non-fill-in-blanks)
+                    let phraseToDisplay;
+                    if (currentMode === 'vi-to-en') {
+                        phraseToDisplay = currentPhraseObj.vi;
+                        correctTranslation = currentPhraseObj.en;
+                    } else { // en-to-vi
+                        phraseToDisplay = currentPhraseObj.en;
+                        correctTranslation = currentPhraseObj.vi;
+                    }
+                    phraseDisplay.textContent = phraseToDisplay;
+
+                    if (currentAnswerMode === 'typing') {
+                        answerInput.style.display = 'block';
+                        checkButton.style.display = 'inline-block';
+                        answerInput.disabled = false;
+                        answerInput.focus();
+                    } else if (currentAnswerMode === 'choices') {
+                        choicesContainer.style.display = 'grid';
+                        let allChoices = [correctTranslation];
+                        const availablePhrasesForChoices = currentPhrases.filter((_, idx) => idx !== currentPhraseIndex);
+
+                        while (allChoices.length < 4 && availablePhrasesForChoices.length > 0) {
+                            const randomIndex = Math.floor(Math.random() * availablePhrasesForChoices.length);
+                            let wrongChoice;
+                            if (currentMode === 'vi-to-en') {
+                                wrongChoice = availablePhrasesForChoices[randomIndex].en;
+                            } else {
+                                wrongChoice = availablePhrasesForChoices[randomIndex].vi;
+                            }
+                            if (!allChoices.includes(wrongChoice) && wrongChoice.toLowerCase() !== correctTranslation.toLowerCase()) {
+                                allChoices.push(wrongChoice);
+                            }
+                            availablePhrasesForChoices.splice(randomIndex, 1);
+                        }
+                        while (allChoices.length < 4) {
+                            allChoices.push(correctTranslation);
+                        }
+                        shuffleArray(allChoices);
+
+                        allChoices.forEach(choice => {
+                            const button = document.createElement('button');
+                            button.textContent = choice;
+                            button.className = 'bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105';
+                            button.onclick = () => selectAnswer(choice, correctTranslation);
+                            choicesContainer.appendChild(button);
+                        });
+                    } else if (currentAnswerMode === 'flashcards') {
+                        flashcardContainer.style.display = 'block';
+                        displayFlashcard(phraseToDisplay, correctTranslation);
+                        scoreDisplay.style.display = 'none'; // Hide score in flashcard mode
+                    }
+                    updateInstructionText(); // Update instruction text for typing/choices/flashcards
+                }
+
+                // Ensure next button is available
+                nextButton.disabled = false;
+
+            } catch (e) {
+                messageDisplay.textContent = "Lỗi khi hiển thị cụm từ: " + e.message;
+                messageDisplay.className = 'incorrect-answer';
+                console.error("Display new phrase error:", e);
+            }
+        }
+
+        // New function to display flashcard
+        function displayFlashcard(frontText, backText) {
+            flashcardContainer.innerHTML = ''; // Clear previous card
+            
+            const flashcardDiv = document.createElement('div');
+            flashcardDiv.className = 'flashcard';
+
+            const frontFace = document.createElement('div');
+            frontFace.className = 'flashcard-face flashcard-front';
+            frontFace.textContent = frontText;
+
+            const backFace = document.createElement('div');
+            backFace.className = 'flashcard-face flashcard-back';
+            backFace.textContent = backText;
+
+            flashcardDiv.appendChild(frontFace);
+            flashcardDiv.appendChild(backFace);
+            flashcardContainer.appendChild(flashcardDiv);
+
+            // Add click listener to flip the card
+            flashcardDiv.addEventListener('click', () => {
+                flashcardDiv.classList.toggle('flipped');
+            });
+
+            // Add "Mark as Known/Unknown" and "Next" buttons below the flashcard
+            const flashcardButtonsDiv = document.createElement('div');
+            flashcardButtonsDiv.className = 'flashcard-buttons';
+
+            const currentPhraseObj = currentPhrases[currentPhraseIndex]; // Get current phrase object
+
+            const knownButton = document.createElement('button');
+            knownButton.textContent = 'Đã biết ✅';
+            knownButton.className = 'known-button';
+            knownButton.onclick = () => {
+                messageDisplay.textContent = 'Tuyệt vời! Cụm từ này đã được đánh dấu là Đã biết.';
+                messageDisplay.className = 'correct-answer';
+                addPhraseToStorage('learnedPhrases', currentPhraseObj); // Save to learned
+                setTimeout(nextPhrase, 500); // Move to next phrase after a short delay
+            };
+
+            const unknownButton = document.createElement('button');
+            unknownButton.textContent = 'Chưa biết ❌';
+            unknownButton.className = 'unknown-button';
+            unknownButton.onclick = () => {
+                messageDisplay.textContent = 'Không sao cả! Hãy luyện tập thêm cụm từ này.';
+                messageDisplay.className = 'incorrect-answer';
+                addPhraseToStorage('reviewPhrases', currentPhraseObj); // Save to review
+                setTimeout(nextPhrase, 500); // Move to next phrase after a short delay
+            };
+
+            flashcardButtonsDiv.appendChild(knownButton);
+            flashcardButtonsDiv.appendChild(unknownButton);
+            flashcardContainer.appendChild(flashcardButtonsDiv);
+
+            // Ensure main game buttons are correctly displayed/hidden for flashcards
+            checkButton.style.display = 'none';
+            nextButton.style.display = 'inline-block'; // Always show next for manual advance
+        }
+
+        // New function for Text-to-Speech
+        function speakPhrase(text, lang = 'en-US') {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = lang; // Set language for pronunciation
+                utterance.pitch = 1; // 0 to 2
+                utterance.rate = 1; // 0.1 to 10
+
+                // Find a suitable voice
+                const voices = speechSynthesis.getVoices();
+                let selectedVoice = voices.find(voice => voice.lang === lang && voice.name.includes('Google') || voice.lang === lang);
+                if (!selectedVoice) {
+                    selectedVoice = voices.find(voice => voice.lang.startsWith(lang.substring(0,2))); // Fallback to language family
+                }
+                if (selectedVoice) {
+                    utterance.voice = selectedVoice;
+                } else {
+                    console.warn(`No voice found for language ${lang}. Using default.`);
+                }
+                
+                speechSynthesis.speak(utterance);
+            } else {
+                messageDisplay.textContent = "Trình duyệt của bạn không hỗ trợ tính năng phát âm.";
+                messageDisplay.className = 'incorrect-answer';
+                console.warn("SpeechSynthesis not supported in this browser.");
+            }
+        }
+
+        // Function to handle selected answer (for 'choices' mode)
+        function selectAnswer(selectedChoice, correctTranslation) {
+            if (currentAnswerMode !== 'choices') return; // Only execute if in choices mode
+
+            const currentPhraseObj = currentPhrases[currentPhraseIndex]; // Get current phrase object
+
+            // Disable all choice buttons after selection
+            Array.from(choicesContainer.children).forEach(button => {
+                button.disabled = true;
+                if (button.textContent === correctTranslation) {
+                    button.classList.add('bg-green-500'); // Highlight correct answer
+                } else if (button.textContent === selectedChoice) {
+                    button.classList.add('bg-red-500'); // Highlight selected incorrect answer
+                }
+            });
+
+            if (selectedChoice === correctTranslation) {
+                score++;
+                messageDisplay.textContent = 'Đúng rồi!';
+                messageDisplay.className = 'correct-answer';
+                scoreDisplay.textContent = `Điểm: ${score}`;
+                addPhraseToStorage('learnedPhrases', currentPhraseObj); // Save to learned
+                // Automatically move to the next phrase after a short delay for user to see result
+                setTimeout(() => {
+                    nextPhrase();
+                }, 1000); 
+            } else {
+                score = Math.max(0, score - 1); // Decrease score, but not below zero
+                messageDisplay.textContent = `Sai rồi. Đáp án đúng là: "${correctTranslation}"`;
+                messageDisplay.className = 'incorrect-answer';
+                scoreDisplay.textContent = `Điểm: ${score}`;
+                addPhraseToStorage('reviewPhrases', currentPhraseObj); // Save to review
+            }
+        }
+
+        // New function to handle selected answer for 'fill-in-blanks' mode
+        function checkFillInBlanksAnswer(selectedWord, correctBlankWord) {
+            if (currentAnswerMode !== 'fill-in-blanks') return;
+
+            const currentPhraseObj = currentPhrases[currentPhraseIndex]; // Get current phrase object
+
+            // Disable all choice buttons after selection
+            Array.from(choicesContainer.children).forEach(button => {
+                button.disabled = true;
+                if (button.textContent.toLowerCase() === correctBlankWord.toLowerCase()) {
+                    button.classList.add('bg-green-500'); // Highlight correct answer
+                } else if (button.textContent.toLowerCase() === selectedWord.toLowerCase()) {
+                    button.classList.add('bg-red-500'); // Highlight selected incorrect answer
+                }
+            });
+
+            if (selectedWord.toLowerCase() === correctBlankWord.toLowerCase()) {
+                score++;
+                messageDisplay.textContent = `Chính xác! Từ đúng là: "${correctBlankWord}"`;
+                messageDisplay.className = 'correct-answer';
+                scoreDisplay.textContent = `Điểm: ${score}`;
+                addPhraseToStorage('learnedPhrases', currentPhraseObj); // Save to learned
+                setTimeout(() => {
+                    nextPhrase();
+                }, 1000);
+            } else {
+                score = Math.max(0, score - 1);
+                messageDisplay.textContent = `Sai rồi. Từ đúng là: "${correctBlankWord}"`;
+                messageDisplay.className = 'incorrect-answer';
+                scoreDisplay.textContent = `Điểm: ${score}`;
+                addPhraseToStorage('reviewPhrases', currentPhraseObj); // Save to review
+            }
+        }
+
+
+        // Function to check the answer (for 'typing' mode)
+        async function checkAnswer() {
+            if (currentAnswerMode !== 'typing' && currentAnswerMode !== 'listening') return; // Only execute if in typing or listening mode
+
+            try {
+                const userAnswer = answerInput.value.trim();
+                let correctAnswer;
+                let originalPhrase;
+                const currentPhraseObj = currentPhrases[currentPhraseIndex]; // Get current phrase object
+
+                // Ensure there's a phrase to check
+                if (!currentPhrases || currentPhrases.length === 0 || currentPhraseIndex >= currentPhrases.length) {
+                    messageDisplay.textContent = "Không có cụm từ để kiểm tra. Vui lòng chọn chủ đề và bắt đầu lại.";
+                    messageDisplay.className = 'incorrect-answer';
+                    return;
+                }
+
+                if (currentAnswerMode === 'listening') {
+                    // In listening mode, the correct answer is always Vietnamese translation
+                    originalPhrase = currentPhrases[currentPhraseIndex].en; // English phrase was played
+                    correctAnswer = currentPhrases[currentPhraseIndex].vi.trim(); // Expect Vietnamese translation
+                } else if (currentMode === 'vi-to-en') {
+                    originalPhrase = currentPhrases[currentPhraseIndex].vi;
+                    correctAnswer = currentPhrases[currentPhraseIndex].en.trim();
+                } else { // en-to-vi
+                    originalPhrase = currentPhrases[currentPhraseIndex].en;
+                    correctAnswer = currentPhrases[currentPhraseIndex].vi.trim();
+                }
+
+                // Direct comparison (case-insensitive)
+                if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+                    messageDisplay.textContent = `Chính xác! Đáp án là: "${correctAnswer}"`;
+                    messageDisplay.className = 'correct-answer';
+                    score++;
+                    scoreDisplay.textContent = `Điểm: ${score}`;
+                    answerInput.disabled = true;
+                    checkButton.disabled = true;
+                    addPhraseToStorage('learnedPhrases', currentPhraseObj); // Save to learned
+                    return; // End function if correct immediately
+                }
+
+                // If not directly correct, check for semantic equivalence using Gemini API
+                messageDisplay.textContent = 'Đang kiểm tra nghĩa tương đồng...';
+                messageDisplay.className = 'loading-text';
+                answerInput.disabled = true;
+                checkButton.disabled = true;
+
+                let languageForGemini = (currentAnswerMode === 'listening' || currentMode === 'en-to-vi') ? 'Vietnamese' : 'English'; // Gemini checks the target language
+                const prompt = `Are the following two phrases semantically equivalent in the context of translation? Respond with 'true' or 'false' only.
+                Phrase 1: '${userAnswer}'
+                Phrase 2: '${correctAnswer}'
+                Language: ${languageForGemini}`;
+
+                let chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                const payload = { contents: chatHistory };
+                // START: API Key for local execution
+                // If you are running this HTML file locally (not in the Canvas environment),
+                // you need to paste your API Key here.
+                // Visit https://aistudio.google.com/app/apikey to generate an API Key.
+                // Ensure your API Key has no HTTP referrer restrictions or allows localhost.
+                const apiKey = "AIzaSyCr1iMqwvgNSsTpY8C7-n454jPXCu26ssc"; // <-- Dán API Key của bạn vào đây! Thay thế "YOUR_API_KEY_HERE" bằng khóa API thực tế của bạn.
+                // END: API Key for local execution
+
+                // Check if API Key is not provided when running locally
+                // __initial_auth_token is only available in the Canvas environment.
+                // If __initial_auth_token is undefined and apiKey is also empty or still the placeholder, then report error.
+                if (typeof __initial_auth_token === 'undefined' && (!apiKey || apiKey === "YOUR_API_KEY_HERE")) {
+                    messageDisplay.textContent = 'Lỗi: API Key chưa được cung cấp hoặc không hợp lệ. Vui lòng dán API Key của bạn vào biến `apiKey` trong code để sử dụng chức năng này khi chạy cục bộ. Hoặc chạy ứng dụng thông qua một máy chủ cục bộ.';
+                    messageDisplay.className = 'incorrect-answer';
+                    answerInput.disabled = false;
+                    checkButton.disabled = false;
+                    return;
+                }
+
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                let isSemanticallyCorrect = false;
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const geminiResponseText = result.candidates[0].content.parts[0].text.trim().toLowerCase();
+                    isSemanticallyCorrect = (geminiResponseText === 'true');
+                } else if (result.error) {
+                    // Handle API errors (e.g., invalid API Key)
+                    messageDisplay.textContent = `Lỗi API: ${result.error.message}. Vui lòng kiểm tra lại API Key của bạn, đảm bảo nó hợp lệ và không bị hạn chế HTTP referrer. Nếu đang chạy cục bộ, hãy thử chạy qua một máy chủ cục bộ (xem hướng dẫn trong code).`;
+                    messageDisplay.className = 'incorrect-answer';
+                    console.error("Gemini API error:", result.error);
+                    return; // Stop function if API error
+                }
+
+                if (isSemanticallyCorrect) {
+                    messageDisplay.textContent = `Chính xác (nghĩa tương đồng)! Đáp án là: "${correctAnswer}"`;
+                    messageDisplay.className = 'correct-answer';
+                    score++;
+                    scoreDisplay.textContent = `Điểm: ${score}`;
+                    addPhraseToStorage('learnedPhrases', currentPhraseObj); // Save to learned
+                } else {
+                    messageDisplay.textContent = `Sai rồi. Đáp án chính xác là: "${correctAnswer}". Hãy thử lại.`; // Removed hint suggestion
+                    messageDisplay.className = 'incorrect-answer';
+                    addPhraseToStorage('reviewPhrases', currentPhraseObj); // Save to review
+                }
+            } catch (e) {
+                messageDisplay.textContent = "Lỗi khi kiểm tra câu trả lời (API): " + e.message + ". Vui lòng kiểm tra kết nối internet hoặc API Key. Nếu đang chạy cục bộ, hãy thử chạy qua một máy chủ cục bộ.";
+                messageDisplay.className = 'incorrect-answer';
+                console.error("Check answer API error:", e);
+            } finally {
+                answerInput.disabled = false;
+                checkButton.disabled = false;
+            }
+        }
+
+        // Function to fetch random phrases from Gemini API
+        async function fetchRandomPhrases(topic, count = 10) {
+            messageDisplay.textContent = 'Đang tạo cụm từ mới online... Vui lòng chờ.';
+            messageDisplay.className = 'loading-text';
+            nextButton.disabled = true;
+            checkButton.disabled = true; // Disable check button during loading
+
+            try {
+                const prompt = `Generate ${count} common and useful English phrases related to the topic of '${topic}'. For each phrase, provide its Vietnamese translation. Return the response as a JSON array of objects, where each object has 'vi' for the Vietnamese phrase and 'en' for the English phrase. Example: [{ "vi": "Xin chào", "en": "Hello" }, { "vi": "Tạm biệt", "en": "Goodbye" }]. Ensure the response is valid JSON.`;
+
+                let chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                const payload = {
+                    contents: chatHistory,
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "ARRAY",
+                            items: {
+                                type: "OBJECT",
+                                properties: {
+                                    "vi": { "type": "STRING" },
+                                    "en": { "type": "STRING" }
+                                },
+                                "propertyOrdering": ["vi", "en"]
+                            }
+                        }
+                    }
+                };
+
+                // START: API Key for local execution
+                const apiKey = "AIzaSyCr1iMqwvgNSsTpY8C7-n454jPXCu26ssc"; // <-- Dán API Key của bạn vào đây! Thay thế "YOUR_API_KEY_HERE" bằng khóa API thực tế của bạn.
+                // END: API Key for local execution
+
+                if (typeof __initial_auth_token === 'undefined' && (!apiKey || apiKey === "YOUR_API_KEY_HERE")) {
+                    throw new Error('API Key chưa được cung cấp hoặc không hợp lệ. Vui lòng dán API Key của bạn vào biến `apiKey` trong code để sử dụng chức năng này khi chạy cục bộ. Hoặc chạy ứng dụng thông qua một máy chủ cục bộ.');
+                }
+
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const jsonString = result.candidates[0].content.parts[0].text;
+                    const parsedPhrases = JSON.parse(jsonString);
+                    if (Array.isArray(parsedPhrases) && parsedPhrases.every(p => p.vi && p.en)) {
+                        return parsedPhrases;
+                    } else {
+                        throw new Error("Dữ liệu trả về từ AI không đúng định dạng.");
+                    }
+                } else if (result.error) {
+                    throw new Error(`Lỗi API: ${result.error.message}`);
+                } else {
+                    throw new Error("Không thể tạo cụm từ mới. Phản hồi từ AI không hợp lệ.");
+                }
+            } catch (e) {
+                console.error('Lỗi khi lấy cụm từ ngẫu nhiên:', e);
+                messageDisplay.textContent = `Lỗi khi tạo cụm từ online: ${e.message}. Vui lòng kiểm tra kết nối internet hoặc API Key.`;
+                messageDisplay.className = 'incorrect-answer';
+                return []; // Return empty array on error
+            } finally {
+                nextButton.disabled = false;
+                checkButton.disabled = false; // Re-enable check button after loading
+            }
+        }
+
+        // Function to move to the next phrase
+        async function nextPhrase() { // Make this function async
+            try {
+                currentPhraseIndex++;
+                if (currentPhraseIndex >= currentPhrases.length) {
+                    // If all phrases in the current set are done, reset the game to get a new set
+                    await resetGame(); // Wait for resetGame to complete fetching new phrases
+                } else {
+                    displayNewPhrase();
+                }
+            } catch (e) {
+                messageDisplay.textContent = "Lỗi khi chuyển cụm từ: " + e.message;
+                messageDisplay.className = 'incorrect-answer';
+                console.error("Next phrase error:", e);
+            }
+        }
+
+        // Function to reset the game
+        async function resetGame() {
+            try {
+                // Clear displays and disable controls during loading
+                phraseDisplay.textContent = "Đang tải cụm từ...";
+                messageDisplay.textContent = "Đang tải cụm từ mới. Vui lòng chờ...";
+                messageDisplay.className = 'loading-text';
+                answerInput.style.display = 'none'; // Hide input
+                choicesContainer.style.display = 'none'; // Hide choices
+                flashcardContainer.style.display = 'none'; // Hide flashcards
+                audioControls.style.display = 'none'; // Hide audio controls
+                checkButton.style.display = 'none'; // Hide check button
+                nextButton.disabled = true; // Disable next button during load
+
+                // Load learned and review phrases from localStorage
+                learnedPhrases = getStoredPhrases('learnedPhrases');
+                reviewPhrases = getStoredPhrases('reviewPhrases');
+
+                let newPhrasesForTopic = [];
+                let useFallback = false;
+
+                // Attempt to fetch online data for non-daily-life topics
+                if (currentTopic !== 'daily-life') {
+                    try {
+                        const fetched = await fetchRandomPhrases(currentTopic);
+                        if (fetched.length > 0) {
+                            newPhrasesForTopic = fetched;
+                        } else {
+                            useFallback = true;
+                            messageDisplay.textContent = 'Không thể tạo cụm từ online. Đang sử dụng dữ liệu có sẵn (nếu có).';
+                            messageDisplay.className = 'hint-text';
+                        }
+                    } catch (e) {
+                        useFallback = true;
+                        messageDisplay.textContent = `Lỗi khi tạo cụm từ online: ${e.message}. Đang sử dụng dữ liệu có sẵn (nếu có).`;
+                        messageDisplay.className = 'incorrect-answer';
+                        console.error("Fetch random phrases error during reset:", e);
+                    }
+                }
+
+                if (currentTopic === 'daily-life' || useFallback) {
+                    if (phrasesByTopic[currentTopic] && phrasesByTopic[currentTopic].length > 0) {
+                        newPhrasesForTopic = [...phrasesByTopic[currentTopic]];
+                        if (useFallback) {
+                            messageDisplay.textContent = 'Đã tải dữ liệu có sẵn cho chủ đề này.';
+                            messageDisplay.className = 'hint-text';
+                        } else {
+                            messageDisplay.textContent = '';
+                            messageDisplay.className = '';
+                        }
+                    } else {
+                        currentPhrases = [];
+                        phraseDisplay.textContent = "Không có cụm từ nào trong chủ đề này. Vui lòng chọn chủ đề khác hoặc thêm cụm từ.";
+                        answerInput.disabled = true;
+                        nextButton.disabled = true;
+                        checkButton.disabled = true;
+                        messageDisplay.textContent = "Lỗi: Chủ đề này chưa có dữ liệu và không thể tạo online.";
+                        messageDisplay.className = 'incorrect-answer';
+                        return;
+                    }
+                }
+
+                // Filter out learned phrases from the new/fallback pool
+                const unlearnedNewPhrases = newPhrasesForTopic.filter(newPhrase =>
+                    !learnedPhrases.some(learned => learned.vi === newPhrase.vi && learned.en === newPhrase.en)
+                );
+
+                // Combine review phrases (prioritized) with unlearned new phrases
+                currentPhrases = [...reviewPhrases, ...unlearnedNewPhrases];
+                shuffleArray(currentPhrases);
+
+                // If after combining and filtering, there are still no phrases,
+                // it means all phrases are learned or there's no data at all.
+                if (currentPhrases.length === 0) {
+                    phraseDisplay.textContent = "Bạn đã học hết tất cả cụm từ trong chủ đề này! Hoặc không có dữ liệu.";
+                    messageDisplay.textContent = "Hãy thử 'Đặt lại tiến độ' để ôn lại hoặc chọn chủ đề khác.";
+                    messageDisplay.className = 'hint-text';
+                    answerInput.disabled = true;
+                    nextButton.disabled = true;
+                    checkButton.disabled = true;
+                    return;
+                }
+
+                currentPhraseIndex = 0;
+                score = 0;
+                scoreDisplay.textContent = `Điểm: ${score}`;
+                nextButton.disabled = false; // Re-enable "Next Phrase" button
+                displayNewPhrase(); // Display the first phrase of the new topic
+            } catch (e) {
+                messageDisplay.textContent = "Lỗi khi đặt lại trò chơi: " + e.message + ". Vui lòng thử lại.";
+                messageDisplay.className = 'incorrect-answer';
+                console.error("Reset game general error:", e);
+            }
+        }
+
+        // Function to reset all progress in localStorage
+        function resetProgress() {
+            if (confirm("Bạn có chắc chắn muốn đặt lại toàn bộ tiến độ học tập? Thao tác này không thể hoàn tác.")) {
+                localStorage.removeItem('learnedPhrases');
+                localStorage.removeItem('reviewPhrases');
+                learnedPhrases = [];
+                reviewPhrases = [];
+                messageDisplay.textContent = "Đã đặt lại toàn bộ tiến độ học tập.";
+                messageDisplay.className = 'hint-text';
+                resetGame(); // Re-initialize the game after clearing progress
+            }
+        }
+
+        // Initialize the game when the page loads
+        window.onload = async function() { // Make onload async if it calls async functions directly
+            try {
+                messageDisplay.textContent = "Đang tải trò chơi...";
+                messageDisplay.className = 'loading-text';
+                updateInstructionText(); // Update initial instructions
+                await resetGame(); // Initialize the game with default topic and mode
+                // messageDisplay.textContent will be cleared or set by resetGame's success path
+            } catch (e) {
+                messageDisplay.textContent = "Lỗi khởi tạo trò chơi: " + e.message + ". Vui lòng tải lại trang và kiểm tra console để biết chi tiết.";
+                messageDisplay.className = 'incorrect-answer';
+                console.error("Game initialization error on load:", e);
+            }
+        };
+
+        // Global error handler to catch any unhandled JavaScript errors
+        window.onerror = function(message, source, lineno, colno, error) {
+            const errorMessage = `Lỗi JavaScript không mong muốn: ${message} tại dòng ${lineno}. Vui lòng kiểm tra console (F12) để biết thêm chi tiết.`;
+            messageDisplay.textContent = errorMessage;
+            messageDisplay.className = 'incorrect-answer';
+            console.error("Unhandled JavaScript Error:", error || message);
+            return true; // Prevent default browser error reporting
+        };
+
+        // Allow user to press Enter to check answer when in typing mode
+        answerInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter' && (currentAnswerMode === 'typing' || currentAnswerMode === 'listening')) {
+                checkAnswer();
+            }
+        });
+    </script>
+</body>
+</html>
