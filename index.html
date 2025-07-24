@@ -347,7 +347,7 @@
             <input type="radio" id="modeChoices" name="answerMode" value="choices" onchange="setAnswerMode(this.value)">
             <label for="modeChoices">Chọn đáp án</label>
             <input type="radio" id="modeFlashcards" name="answerMode" value="flashcards" onchange="setAnswerMode(this.value)">
-            <label for="modeFlashcards">Lật thẻ</label>
+            <label for="modeFlashcards">Thẻ học từ</label>
             <input type="radio" id="modeFillInBlanks" name="answerMode" value="fill-in-blanks" onchange="setAnswerMode(this.value)">
             <label for="modeFillInBlanks">Điền từ</label>
             <input type="radio" id="modeListening" name="answerMode" value="listening" onchange="setAnswerMode(this.value)">
@@ -1465,51 +1465,71 @@
             nextButton.style.display = 'inline-block'; // Always show next for manual advance
         }
 
-        // New function for Text-to-Speech
-        function speakPhrase(text, lang = 'en-US') {
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = lang; // Set language for pronunciation
-                utterance.pitch = 1; // 0 to 2
-                utterance.rate = 1; // 0.1 to 10
+        let availableVoices = [];
 
-                // Find a suitable voice
-                const voices = speechSynthesis.getVoices();
-                let selectedVoice = null;
-
-                // Prioritize specific English voices
-                const preferredEnglishVoices = [
-                    voices.find(voice => voice.lang === 'en-US' && voice.name.includes('Google')),
-                    voices.find(voice => voice.lang === 'en-GB' && voice.name.includes('Google')),
-                    voices.find(voice => voice.lang === 'en-US'),
-                    voices.find(voice => voice.lang === 'en-GB')
-                ].filter(Boolean); // Filter out nulls
-
-                if (lang.startsWith('en')) { // If the requested language is English
-                    selectedVoice = preferredEnglishVoices.find(voice => voice); // Take the first available preferred English voice
-                    if (!selectedVoice) {
-                        // Fallback to any English voice if specific ones not found
-                        selectedVoice = voices.find(voice => voice.lang.startsWith('en'));
-                    }
-                } else { // For other languages (like Vietnamese)
-                    selectedVoice = voices.find(voice => voice.lang === lang && voice.name.includes('Google'));
-                    if (!selectedVoice) {
-                        selectedVoice = voices.find(voice => voice.lang.startsWith(lang.substring(0,2)));
-                    }
-                }
-                
-                if (selectedVoice) {
-                    utterance.voice = selectedVoice;
-                    speechSynthesis.speak(utterance);
+        // Function to load voices, ensuring they are ready
+        function loadVoices() {
+            return new Promise(resolve => {
+                const populateVoices = () => {
+                    availableVoices = speechSynthesis.getVoices();
+                    console.log("Voices loaded:", availableVoices.map(v => v.name + ' (' + v.lang + ')'));
+                    resolve();
+                };
+                // If voices are already loaded, resolve immediately
+                if (speechSynthesis.getVoices().length > 0) {
+                    populateVoices();
                 } else {
-                    messageDisplay.textContent = `Thiết bị của bạn có thể không hỗ trợ phát âm tiếng ${lang === 'en-US' ? 'Anh' : 'Việt'}. Vui lòng kiểm tra cài đặt ngôn ngữ và giọng nói của thiết bị.`;
-                    messageDisplay.className = 'incorrect-answer';
-                    console.warn(`No suitable voice found for language ${lang}. Using default or no speech.`);
+                    // Otherwise, wait for the voiceschanged event
+                    speechSynthesis.onvoiceschanged = populateVoices;
                 }
-            } else {
+            });
+        }
+
+        // New function for Text-to-Speech
+        async function speakPhrase(text, lang = 'en-US') {
+            if (!('speechSynthesis' in window)) {
                 messageDisplay.textContent = "Trình duyệt của bạn không hỗ trợ tính năng phát âm.";
                 messageDisplay.className = 'incorrect-answer';
                 console.warn("SpeechSynthesis not supported in this browser.");
+                return;
+            }
+
+            // Ensure voices are loaded before attempting to speak
+            if (availableVoices.length === 0) {
+                await loadVoices();
+            }
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = lang; // Set language for pronunciation
+            utterance.pitch = 1; // 0 to 2
+            utterance.rate = 1; // 0.1 to 10
+
+            let selectedVoice = null;
+
+            // Strictly try to find English voices if the requested language is English
+            if (lang.startsWith('en')) {
+                // Prioritize specific English voices (Google, then generic en-US/en-GB)
+                selectedVoice = availableVoices.find(voice => voice.lang === 'en-US' && voice.name.includes('Google')) ||
+                                availableVoices.find(voice => voice.lang === 'en-GB' && voice.name.includes('Google')) ||
+                                availableVoices.find(voice => voice.lang === 'en-US') ||
+                                availableVoices.find(voice => voice.lang === 'en-GB');
+
+                if (!selectedVoice) {
+                    // Fallback to any English voice if specific ones not found
+                    selectedVoice = availableVoices.find(voice => voice.lang.startsWith('en'));
+                }
+            } 
+            // Removed the 'else' block that would try to find Vietnamese voices or other languages.
+            // This ensures only English voices are attempted for English text.
+
+            if (selectedVoice) {
+                utterance.voice = selectedVoice;
+                speechSynthesis.speak(utterance);
+            } else {
+                // If no suitable English voice is found, inform the user.
+                messageDisplay.textContent = `Thiết bị của bạn có thể không hỗ trợ phát âm tiếng Anh. Vui lòng kiểm tra cài đặt ngôn ngữ và giọng nói của thiết bị.`;
+                messageDisplay.className = 'incorrect-answer';
+                console.warn(`No suitable English voice found for language ${lang}. Using default or no speech.`);
             }
         }
 
@@ -1907,6 +1927,8 @@
             try {
                 messageDisplay.textContent = "Đang tải trò chơi...";
                 messageDisplay.className = 'loading-text';
+                // Load voices once at the start
+                await loadVoices(); 
                 updateInstructionText(); // Update initial instructions
                 await resetGame(); // Initialize the game with default topic and mode
                 // messageDisplay.textContent will be cleared or set by resetGame's success path
