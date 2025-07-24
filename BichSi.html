@@ -4,52 +4,45 @@
   <meta charset="UTF-8">
   <title>Đăng nhập Học tiếng Anh</title>
   <script type="module">
-    // Import Firebase SDK
-// Import Firebase SDK
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-// Firebase cấu hình
-const firebaseConfig = {
-  apiKey: "AIzaSyAdcwYMvq6GvNENhkVvzzF69CvoBQY3vqA",
-  authDomain: "bichsi.firebaseapp.com",
-  projectId: "bichsi",
-  storageBucket: "bichsi.firebasestorage.app",
-  messagingSenderId: "333861660997",
-  appId: "1:333861660997:web:8df52695e9f34c4269362c",
-  measurementId: "G-DMQ6TERPM1"
-};
+    const firebaseConfig = {
+      apiKey: "AIzaSyAdcwYMvq6GvNENhkVvzzF69CvoBQY3vqA",
+      authDomain: "bichsi.firebaseapp.com",
+      projectId: "bichsi",
+      storageBucket: "bichsi.firebasestorage.app",
+      messagingSenderId: "333861660997",
+      appId: "1:333861660997:web:8df52695e9f34c4269362c",
+      measurementId: "G-DMQ6TERPM1"
+    };
 
-// Khởi tạo Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-// Đăng ký tài khoản
-window.register = async () => {
-  const email = document.getElementById('regEmail').value;
-  const password = document.getElementById('regPassword').value;
-  try {
-    await createUserWithEmailAndPassword(auth, email, password);
-    alert("✅ Tạo tài khoản thành công!");
-  } catch (err) {
-    alert("❌ Lỗi: " + err.message);
-  }
-}
+    window.register = async () => {
+      const email = document.getElementById('regEmail').value;
+      const password = document.getElementById('regPassword').value;
+      try {
+        await createUserWithEmailAndPassword(auth, email, password);
+        alert("Tạo tài khoản thành công! Hãy đăng nhập");
+      } catch (err) {
+        alert("Lỗi: " + err.message);
+      }
+    };
 
-// Đăng nhập
-window.login = async () => {
-  const email = document.getElementById('loginEmail').value;
-  const password = document.getElementById('loginPassword').value;
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-    alert("✅ Đăng nhập thành công!");
-    document.getElementById('auth-screen').style.display = 'none';
-    document.getElementById('main-app').style.display = 'block';
-  } catch (err) {
-    alert("❌ Sai tài khoản hoặc mật khẩu.");
-  }
-}
-
+    window.login = async () => {
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        alert("Đăng nhập thành công!");
+        document.getElementById('auth-screen').style.display = 'none';
+        document.getElementById('main-app').style.display = 'block';
+      } catch (err) {
+        alert("Sai tài khoản hoặc mật khẩu!\n" + err.message);
+      }
+    };
   </script>
 </head>
 <body>
