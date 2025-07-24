@@ -30,10 +30,10 @@
             box-sizing: border-box; /* Ensure padding is included in width */
         }
         h1 {
-            color: #2c3e50; /* Title color */
+            color: #2ecc71; /* Title color changed to green */
             margin-bottom: 18px; /* Adjusted margin */
             font-weight: 700;
-            font-size: 1.8em; /* Adjusted font size for mobile */
+            font-size: 2.5em; /* Adjusted font size for mobile, made larger */
             word-wrap: break-word; /* Ensure long titles wrap */
         }
         p {
@@ -316,7 +316,7 @@
 </head>
 <body>
     <div class="game-container">
-        <h1>Học tiếng Anh giao tiếp hàng ngày cùng Bích Sì</h1>
+        <h1>Học tiếng Anh giao tiếp hàng ngày</h1>
         <div class="selector-group">
             <div class="flex flex-col items-center">
                 <label for="gameMode" class="block text-gray-700 text-sm font-bold mb-1">Chọn chế độ dịch:</label>
@@ -329,7 +329,7 @@
                 <label for="gameTopic" class="block text-gray-700 text-sm font-bold mb-1">Chọn chủ đề:</label>
                 <select id="gameTopic" class="topic-selector" onchange="setGameTopic(this.value)">
                     <option value="daily-life">Cuộc sống hàng ngày</option>
-                    <option value="entertainment">Giải trí</option>
+                    <option value="entertainment">Giải trí</
                     <option value="science">Khoa học</option>
                     <option value="tourism">Du lịch</option>
                     <option value="technology">Công nghệ</option>
@@ -1475,17 +1475,37 @@
 
                 // Find a suitable voice
                 const voices = speechSynthesis.getVoices();
-                let selectedVoice = voices.find(voice => voice.lang === lang && voice.name.includes('Google') || voice.lang === lang);
-                if (!selectedVoice) {
-                    selectedVoice = voices.find(voice => voice.lang.startsWith(lang.substring(0,2))); // Fallback to language family
-                }
-                if (selectedVoice) {
-                    utterance.voice = selectedVoice;
-                } else {
-                    console.warn(`No voice found for language ${lang}. Using default.`);
+                let selectedVoice = null;
+
+                // Prioritize specific English voices
+                const preferredEnglishVoices = [
+                    voices.find(voice => voice.lang === 'en-US' && voice.name.includes('Google')),
+                    voices.find(voice => voice.lang === 'en-GB' && voice.name.includes('Google')),
+                    voices.find(voice => voice.lang === 'en-US'),
+                    voices.find(voice => voice.lang === 'en-GB')
+                ].filter(Boolean); // Filter out nulls
+
+                if (lang.startsWith('en')) { // If the requested language is English
+                    selectedVoice = preferredEnglishVoices.find(voice => voice); // Take the first available preferred English voice
+                    if (!selectedVoice) {
+                        // Fallback to any English voice if specific ones not found
+                        selectedVoice = voices.find(voice => voice.lang.startsWith('en'));
+                    }
+                } else { // For other languages (like Vietnamese)
+                    selectedVoice = voices.find(voice => voice.lang === lang && voice.name.includes('Google'));
+                    if (!selectedVoice) {
+                        selectedVoice = voices.find(voice => voice.lang.startsWith(lang.substring(0,2)));
+                    }
                 }
                 
-                speechSynthesis.speak(utterance);
+                if (selectedVoice) {
+                    utterance.voice = selectedVoice;
+                    speechSynthesis.speak(utterance);
+                } else {
+                    messageDisplay.textContent = `Thiết bị của bạn có thể không hỗ trợ phát âm tiếng ${lang === 'en-US' ? 'Anh' : 'Việt'}. Vui lòng kiểm tra cài đặt ngôn ngữ và giọng nói của thiết bị.`;
+                    messageDisplay.className = 'incorrect-answer';
+                    console.warn(`No suitable voice found for language ${lang}. Using default or no speech.`);
+                }
             } else {
                 messageDisplay.textContent = "Trình duyệt của bạn không hỗ trợ tính năng phát âm.";
                 messageDisplay.className = 'incorrect-answer';
