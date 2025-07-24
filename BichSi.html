@@ -1,12 +1,26 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <title>Giới thiệu</title>
-</head>
 <body>
-  <h1>Trang Giới thiệu</h1>
-  <p>Chào mừng đến với trang giới thiệu của tui!</p>
-  <a href="index.html">⬅️ Quay lại trang chính</a>
+  <!-- Vùng: Đăng nhập -->
+  <div id="login-screen">
+    <h2>Đăng nhập</h2>
+    <input type="text" id="username" placeholder="Tên đăng nhập">
+    <input type="password" id="password" placeholder="Mật khẩu">
+    <button onclick="login()">Đăng nhập</button>
+    <p>Chưa có tài khoản? <a href="#" onclick="showRegister()">Tạo tài khoản</a></p>
+  </div>
+
+  <!-- Vùng: Đăng ký -->
+  <div id="register-screen" style="display:none">
+    <!-- tương tự login -->
+  </div>
+
+  <!-- Vùng: Chọn chủ đề -->
+  <div id="topic-screen" style="display:none">
+    <h2>Chọn chủ đề</h2>
+    <!-- danh sách chủ đề -->
+  </div>
+
+  <!-- Vùng: Học từ -->
+  <div id="study-screen" style="display:none">
+    <!-- hiện từ, nghe, quiz, ô nhập,... -->
+  </div>
 </body>
-</html>
