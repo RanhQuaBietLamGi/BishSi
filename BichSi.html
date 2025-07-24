@@ -1,62 +1,108 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>Đăng nhập Học tiếng Anh</title>
-  <!-- Firebase SDK v9 -->
-  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-auth.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAdcwYMvq6GvNENhkVvzzF69CvoBQY3vqA",
-      authDomain: "bichsi.firebaseapp.com",
-      projectId: "bichsi",
-      storageBucket: "bichsi.firebasestorage.app",
-      messagingSenderId: "333861660997",
-      appId: "1:333861660997:web:8df52695e9f34c4269362c",
-      measurementId: "G-DMQ6TERPM1"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-
-    function register() {
-      const email = document.getElementById('regEmail').value;
-      const password = document.getElementById('regPassword').value;
-      auth.createUserWithEmailAndPassword(email, password)
-        .then(() => alert("✅ Tạo tài khoản thành công!"))
-        .catch(err => alert("❌ Lỗi: " + err.message));
-    }
-
-    function login() {
-      const email = document.getElementById('loginEmail').value;
-      const password = document.getElementById('loginPassword').value;
-      auth.signInWithEmailAndPassword(email, password)
-        .then(() => {
-          alert("✅ Đăng nhập thành công!");
-          document.getElementById('auth-screen').style.display = 'none';
-          document.getElementById('main-app').style.display = 'block';
-        })
-        .catch(err => alert("❌ Sai tài khoản hoặc mật khẩu!\n" + err.message));
-    }
-  </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Web Dạy Tiếng Anh</title>
+    <!-- Liên kết đến tệp CSS để định kiểu -->
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Sử dụng font Inter cho toàn bộ trang */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
 </head>
-<body>
-  <div id="auth-screen">
-    <h2>🔐 Đăng nhập</h2>
-    <input id="loginEmail" placeholder="Email" type="email" /><br>
-    <input id="loginPassword" placeholder="Mật khẩu" type="password" /><br>
-    <button onclick="login()">Đăng nhập</button>
+<body class="bg-gray-100 text-gray-800 flex flex-col min-h-screen">
+    <header class="bg-blue-600 text-white p-4 shadow-md rounded-b-lg">
+        <h1 class="text-3xl font-bold text-center">Chào Mừng Đến Với Trang Web Dạy Tiếng Anh Của Tôi!</h1>
+    </header>
 
-    <h2>📋 Đăng ký</h2>
-    <input id="regEmail" placeholder="Email mới" type="email" /><br>
-    <input id="regPassword" placeholder="Mật khẩu mới" type="password" /><br>
-    <button onclick="register()">Tạo tài khoản</button>
-  </div>
+    <nav class="bg-blue-700 p-3 shadow-sm">
+        <ul class="flex justify-center space-x-6">
+            <li><a href="#" class="text-white hover:text-blue-200 transition duration-300 ease-in-out font-medium p-2 rounded-md hover:bg-blue-800">Trang Chủ</a></li>
+            <li><a href="#tai-lieu-bai-giang" class="text-white hover:text-blue-200 transition duration-300 ease-in-out font-medium p-2 rounded-md hover:bg-blue-800">Tài Liệu Bài Giảng</a></li>
+            <li><a href="#" class="text-white hover:text-blue-200 transition duration-300 ease-in-out font-medium p-2 rounded-md hover:bg-blue-800">Ngữ Pháp</a></li>
+            <li><a href="#" class="text-white hover:text-blue-200 transition duration-300 ease-in-out font-medium p-2 rounded-md hover:bg-blue-800">Từ Vựng</a></li>
+            <li><a href="#" class="text-white hover:text-blue-200 transition duration-300 ease-in-out font-medium p-2 rounded-md hover:bg-blue-800">Luyện Nghe</a></li>
+            <li><a href="#" class="text-white hover:text-blue-200 transition duration-300 ease-in-out font-medium p-2 rounded-md hover:bg-blue-800">Liên Hệ</a></li>
+        </ul>
+    </nav>
 
-  <div id="main-app" style="display: none">
-    <h1>🎉 Chào mừng đến với trang học tiếng Anh!</h1>
-    <p>Đây là khu vực sau khi đăng nhập thành công. Từ đây anh sẽ vào chọn chủ đề và học.</p>
-  </div>
+    <main class="flex-grow container mx-auto p-6 my-8 bg-white rounded-lg shadow-xl">
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold text-blue-800 mb-4">Về Tôi - Giáo Viên Tiếng Anh Của Bạn</h2>
+            <p class="text-lg leading-relaxed">
+                Xin chào! Tôi là một giáo viên tiếng Anh với nhiều năm kinh nghiệm giảng dạy cho mọi lứa tuổi và trình độ. 
+                Trang web này được tạo ra với sứ mệnh cung cấp một nguồn tài liệu học tập phong phú và hiệu quả, 
+                giúp các bạn tự tin hơn trên hành trình chinh phục tiếng Anh.
+            </p>
+            <p class="text-lg leading-relaxed mt-3">
+                Tại đây, bạn sẽ tìm thấy các bài học được thiết kế khoa học, từ ngữ pháp cơ bản đến nâng cao, 
+                các bài tập từ vựng đa dạng, và tài liệu luyện nghe, nói thực tế. 
+                Mục tiêu của tôi là biến việc học tiếng Anh trở nên thú vị và dễ tiếp cận hơn bao giờ hết.
+            </p>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold text-blue-800 mb-4">Các Khóa Học & Tài Nguyên Nổi Bật</h2>
+            <ul class="list-disc list-inside text-lg leading-relaxed">
+                <li><span class="font-bold">Bài học tương tác:</span> Ngữ pháp, từ vựng, phát âm qua các ví dụ và bài tập thực hành.</li>
+                <li><span class="font-bold">Tài liệu ngữ pháp chi tiết:</span> Giải thích rõ ràng, dễ hiểu về các cấu trúc ngữ pháp.</li>
+                <li><span class="font-bold">Bài tập từ vựng đa dạng:</span> Giúp mở rộng vốn từ của bạn một cách nhanh chóng.</li>
+                <li><span class="font-bold">Luyện nghe & nói:</span> Các đoạn hội thoại, bài nghe thực tế để nâng cao kỹ năng giao tiếp.</li>
+                <li><span class="font-bold">Mẹo học tiếng Anh hiệu quả:</span> Chia sẻ kinh nghiệm và phương pháp học tập tối ưu.</li>
+            </ul>
+        </section>
+
+        <!-- Phần Tài liệu Bài giảng -->
+        <section id="tai-lieu-bai-giang" class="mb-8 p-6 bg-blue-50 rounded-lg shadow-inner">
+            <h2 class="text-2xl font-semibold text-blue-800 mb-4">Tài Liệu Bài Giảng</h2>
+            <p class="text-lg leading-relaxed mb-4">
+                Dưới đây là danh sách các tài liệu bài giảng của tôi, bạn có thể tải về hoặc xem trực tiếp.
+            </p>
+
+            <ul class="list-disc list-inside text-lg leading-relaxed">
+                <li class="mb-2">
+                    <a href="documents/Bai_Giang_Ngu_Phap_Co_Ban.pdf" target="_blank" class="text-blue-600 hover:underline font-semibold">
+                        Bài Giảng Ngữ Pháp Cơ Bản (PDF)
+                    </a>
+                    <span class="text-gray-600 ml-2">(Giới thiệu về các thì cơ bản trong tiếng Anh)</span>
+                </li>
+                <li class="mb-2">
+                    <a href="documents/Tu_Vung_Hang_Ngay.pptx" target="_blank" class="text-blue-600 hover:underline font-semibold">
+                        Từ Vựng Hàng Ngày (PowerPoint)
+                    </a>
+                    <span class="text-gray-600 ml-2">(Các từ vựng thông dụng cho giao tiếp hàng ngày)</span>
+                </li>
+                <li class="mb-2">
+                    <a href="documents/Luyen_Nghe_Level_A1.pdf" target="_blank" class="text-blue-600 hover:underline font-semibold">
+                        Luyện Nghe Level A1 (PDF)
+                    </a>
+                    <span class="text-gray-600 ml-2">(Tài liệu luyện nghe dành cho người mới bắt đầu)</span>
+                </li>
+                <!-- Thêm các liên kết đến các tệp PDF/PowerPoint khác của bạn tại đây -->
+                <!-- Ví dụ:
+                <li class="mb-2">
+                    <a href="documents/Bai_Giang_Phat_Am.pdf" target="_blank" class="text-blue-600 hover:underline font-semibold">
+                        Bài Giảng Phát Âm (PDF)
+                    </a>
+                    <span class="text-gray-600 ml-2">(Hướng dẫn phát âm chuẩn)</span>
+                </li>
+                -->
+            </ul>
+        </section>
+        <!-- Kết thúc phần Tài liệu Bài giảng -->
+
+    </main>
+
+    <footer class="bg-gray-800 text-white p-6 mt-auto text-center rounded-t-lg">
+        <p class="text-sm">&copy; 2025 Trang Web Dạy Tiếng Anh. Mọi quyền được bảo lưu.</p>
+        <p class="text-sm mt-1">Cùng nhau khám phá thế giới tiếng Anh!</p>
+    </footer>
+
+    <!-- Liên kết đến tệp JavaScript để thêm tương tác -->
+    <script src="js/script.js"></script>
 </body>
 </html>
