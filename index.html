@@ -1521,6 +1521,7 @@
             } 
             // Removed the 'else' block that would try to find Vietnamese voices or other languages.
             // This ensures only English voices are attempted for English text.
+            // This is the part that explicitly prevents Vietnamese voices from being selected for English text.
 
             if (selectedVoice) {
                 utterance.voice = selectedVoice;
