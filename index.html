@@ -1253,13 +1253,8 @@
 
                     // Event listener for play audio button
                     playAudioButton.onclick = () => {
-                        speakPhrase(phraseToSpeak, 'en-US'); // Speak English phrase
                         playAudioButton.disabled = true; // Disable until speech ends
-
-                        // After speaking, re-enable the play button and show input/check button
-                        const utterance = new SpeechSynthesisUtterance(phraseToSpeak);
-                        utterance.lang = 'en-US';
-                        utterance.onend = () => {
+                        speakPhrase(phraseToSpeak, 'en-US', () => { // Pass callback to speakPhrase
                             if (currentAnswerMode === 'listening') { // Ensure still in listening mode
                                 playAudioButton.disabled = false; // Re-enable play button
                                 answerInput.style.display = 'block';
@@ -1269,8 +1264,7 @@
                                 answerInput.focus();
                                 instructionText.textContent = "Gõ bản dịch tiếng Việt của cụm từ bạn vừa nghe:";
                             }
-                        };
-                        speechSynthesis.speak(utterance);
+                        });
                     };
 
                 } else if (currentAnswerMode === 'fill-in-blanks') {
@@ -1486,11 +1480,12 @@
         }
 
         // New function for Text-to-Speech
-        async function speakPhrase(text, lang = 'en-US') {
+        async function speakPhrase(text, lang = 'en-US', onEndCallback = null) { // Added onEndCallback parameter
             if (!('speechSynthesis' in window)) {
                 messageDisplay.textContent = "Trình duyệt của bạn không hỗ trợ tính năng phát âm.";
                 messageDisplay.className = 'incorrect-answer';
                 console.warn("SpeechSynthesis not supported in this browser.");
+                if (onEndCallback) onEndCallback(); // Call callback even if not supported
                 return;
             }
 
@@ -1521,16 +1516,19 @@
             } 
             // Removed the 'else' block that would try to find Vietnamese voices or other languages.
             // This ensures only English voices are attempted for English text.
-            // This is the part that explicitly prevents Vietnamese voices from being selected for English text.
 
             if (selectedVoice) {
                 utterance.voice = selectedVoice;
+                if (onEndCallback) { // Attach callback if provided
+                    utterance.onend = onEndCallback;
+                }
                 speechSynthesis.speak(utterance);
             } else {
                 // If no suitable English voice is found, inform the user.
                 messageDisplay.textContent = `Thiết bị của bạn có thể không hỗ trợ phát âm tiếng Anh. Vui lòng kiểm tra cài đặt ngôn ngữ và giọng nói của thiết bị.`;
                 messageDisplay.className = 'incorrect-answer';
                 console.warn(`No suitable English voice found for language ${lang}. Using default or no speech.`);
+                if (onEndCallback) onEndCallback(); // Call callback even if no voice found
             }
         }
 
